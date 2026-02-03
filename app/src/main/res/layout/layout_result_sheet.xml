@@ -3,53 +3,60 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical"
-    android:fitsSystemWindows="true">
+    android:orientation="vertical">
 
-    <!-- Top Drag Handle -->
+
+    <!-- 1. Top Drag Handle -->
     <com.google.android.material.bottomsheet.BottomSheetDragHandleView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        android:layout_height="wrap_content" />
 
-    <!-- Status Header -->
 
-    <!-- Buyer & Ticket Info -->
+    <!-- 2. Status Header (Icon + Text) -->
     <LinearLayout
         android:id="@+id/sheetHeaderBar"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="62dp"
         android:gravity="center_vertical"
+        android:orientation="horizontal"
         android:paddingHorizontal="24dp"
-        android:paddingVertical="16dp">
-
-        <TextView
-            android:id="@+id/sheetStatusText"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="VERIFICADO"
-            android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
-            android:textStyle="bold" />
+        android:paddingVertical="8dp">
 
         <ImageView
             android:id="@+id/statusIcon"
             android:layout_width="32dp"
             android:layout_height="32dp"
-            android:src="@drawable/ic_success" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:paddingHorizontal="24dp"
-        android:paddingBottom="16dp">
+            android:src="@drawable/ic_success"
+            app:tint="#39966B" />
 
         <TextView
+            android:id="@+id/sheetStatusText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:text="VERIFICADO"
+            android:textAppearance="@style/TextAppearance.Material3.TitleLarge"
+            android:textColor="#39966B"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+    <!-- 3. Main Content Area -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="620dp"
+        android:orientation="vertical"
+        android:paddingHorizontal="24dp"
+        android:paddingTop="16dp">
+
+        <!-- Buyer Info -->
+        <TextView
+            android:id="@+id/buyerNameLabel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Portador do Bilhete"
-            android:textAppearance="@style/TextAppearance.Material3.BodySmall" />
+            android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
+            android:textColor="?android:attr/textColorSecondary"
+            android:textSize="18sp" />
 
         <TextView
             android:id="@+id/sheetBuyerName"
@@ -57,31 +64,56 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
             android:text="Kenedy Salvaterra"
-            android:textAppearance="@style/TextAppearance.Material3.HeadlineSmall"
+            android:textAppearance="@style/TextAppearance.Material3.HeadlineMedium"
             android:textStyle="bold" />
 
+        <!-- Divider -->
         <View
+            android:id="@+id/divider"
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:layout_marginVertical="20dp"
             android:background="?attr/colorOutlineVariant" />
 
+        <!-- Dynamic Ticket Details -->
+        <LinearLayout
+            android:id="@+id/ticketDetailsContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" />
+
+        <!-- 3. Ticket List Section -->
         <TextView
-            android:id="@+id/sheetTicketDetails"
+            android:id="@+id/ticketsLabel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="NORMAL • Qnt: 1"
-            android:textAppearance="@style/TextAppearance.Material3.BodyLarge" />
+            android:layout_marginBottom="8dp"
+            android:text="Detalhes do Bilhete"
+            android:textAllCaps="true"
+            android:textAppearance="@style/TextAppearance.Material3.LabelMedium"
+            android:textColor="?android:attr/textColorSecondary" />
 
+        <!-- 4. Footer Message -->
+        <TextView
+            android:id="@+id/sheetMessage"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
+            android:textColor="?android:attr/textColorSecondary"
+            android:textStyle="italic" />
+
+        <!-- Action Button -->
         <com.google.android.material.button.MaterialButton
             android:id="@+id/sheetCloseButton"
             style="@style/Widget.Material3.Button.TonalButton"
-            app:backgroundTint="#39966B"
             android:layout_width="match_parent"
-            android:layout_height="60dp"
-            android:layout_marginTop="32dp"
+            android:layout_height="56dp"
+            android:layout_marginTop="100dp"
             android:text="CONTINUAR"
             android:textColor="#FFFFFF"
+            android:textSize="18sp"
+            app:backgroundTint="#39966B"
             app:cornerRadius="16dp" />
 
     </LinearLayout>

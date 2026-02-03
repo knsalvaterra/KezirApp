@@ -50,7 +50,7 @@ interface ApiService {
         @Body request: VerifyRequest
     ): VerifyResponse
 }
-
+//singleton instance
 object ApiClient {
     val api: ApiService by lazy {
         Retrofit.Builder()

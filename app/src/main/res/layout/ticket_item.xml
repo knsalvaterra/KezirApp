@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:paddingVertical="12dp"
+    android:gravity="center_vertical">
+
+    <TextView
+        android:id="@+id/ticketName"
+        android:layout_width="6dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:textAppearance="@style/TextAppearance.Material3.BodyLarge"
+        android:textStyle="bold"
+        android:textColor="?attr/colorOnSurface"/>
+
+    <TextView
+        android:id="@+id/ticketQuantity"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/input_bg_rounded"
+        android:backgroundTint="#1A000000"
+        android:paddingHorizontal="18dp"
+        android:paddingVertical="8dp"
+        android:textAppearance="@style/TextAppearance.Material3.BodySmall"
+        android:textStyle="bold"
+        android:textColor="?attr/colorOnSurfaceVariant"/>
+
+</LinearLayout>

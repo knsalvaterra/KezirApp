@@ -22,6 +22,8 @@
     <style name="CustomBottomSheetStyle" parent="Widget.Material3.BottomSheet">
         <item name="shapeAppearance">@style/CustomShape</item>
         <item name="backgroundTint">#FFF8F8</item>
+        <item name="behavior_peekHeight">600dp</item>
+        <item name="behavior_fitToContents">false</item>
     </style>
 
     <style name="CustomShape" parent="ShapeAppearance.Material3.LargeComponent">

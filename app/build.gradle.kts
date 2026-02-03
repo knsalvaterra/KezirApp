@@ -34,6 +34,11 @@ android {
     buildFeatures {
         viewBinding = true
     }
+    packagingOptions {
+        jniLibs {
+            useLegacyPackaging = true
+        }
+    }
 }
 
 dependencies {
