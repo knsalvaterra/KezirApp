@@ -26,12 +26,16 @@
         app:layout_constraintEnd_toEndOf="parent"/>
 
     <!-- Dark tint overlay -->
+
+    <!-- 2. TOP LAYER: Toolbar -->
+
     <View
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#4D000000" />
+        android:background="#4D000000"
+        tools:layout_editor_absoluteX="0dp"
+        tools:layout_editor_absoluteY="0dp" />
 
-    <!-- 2. TOP LAYER: Toolbar -->
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
@@ -59,40 +63,7 @@
         app:layout_constraintBottom_toTopOf="@+id/bottomPanel"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/toolbar">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:orientation="vertical"
-            android:padding="32dp">
-
-            <View
-                android:layout_width="60dp"
-                android:layout_height="4dp"
-                android:background="#4DFFFFFF"
-                android:layout_marginBottom="24dp" />
-
-            <TextView
-                android:id="@+id/statusIcon"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="🎟️"
-                android:textSize="48sp" />
-
-            <TextView
-                android:id="@+id/resultTitle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                android:text="Aguardando Scan..."
-                android:textColor="#FFFFFF"
-                android:textAppearance="@style/TextAppearance.Material3.HeadlineSmall"
-                android:textStyle="bold" />
-
-        </LinearLayout>
-    </com.google.android.material.card.MaterialCardView>
+        app:layout_constraintTop_toBottomOf="@id/toolbar"/>
 
     <!-- 4. BOTTOM LAYER: Manual Entry Panel -->
     <com.google.android.material.card.MaterialCardView
@@ -116,7 +87,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Problemas ao scanear? insira manualmente"
+                android:text="Problemas em scanear? Insira manualmente"
                 android:textColor="#666666"
                 android:textStyle="bold"
                 android:textSize="14sp" />
@@ -138,6 +109,8 @@
                 android:layout_height="60dp"
                 android:layout_marginTop="16dp"
                 android:text="VERIFICAR"
+                android:textColor="#FFFFFF"
+                app:backgroundTint="#39966B"
                 app:cornerRadius="16dp" />
 
         </LinearLayout>

@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">Kezir App</string>
+    <string name="unauthenticated">Não autenticado</string>
+    <string name="invalid_ticket_or_connection_error">Bilhete inválido ou erro de conexão.</string>
+    <string name="invalid_pin">PIN inválido</string>
+    <string name="login_error">Erro de login</string>
+    <string name="camera_permission_denied">Permissão da câmera negada</string>
 </resources>
