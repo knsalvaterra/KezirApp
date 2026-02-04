@@ -15,6 +15,19 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <dev.knsalvaterra.kezir.ScannerOverlayView
+        android:id="@+id/scanner_overlay"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:overlay_borderColor="#FFFFFF"
+        app:overlay_borderWidth="8dp"
+        app:overlay_cornerRadius="16dp"
+        app:overlay_cornerLengthRatio="0.1" />
+
     <!-- dark tint when theres no camera permissions -->
     <View
         android:layout_width="match_parent"
@@ -35,19 +48,6 @@
         app:titleCentered="true"
         app:titleTextAppearance="@style/TextAppearance.Material3.TitleLarge"
         app:titleTextColor="#FFFFFF" />
-
-    <!-- scanning box ,65% screen width -->
-    <View
-        android:id="@+id/scanFrame"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:background="@drawable/scanner_frame"
-        app:layout_constraintBottom_toTopOf="@+id/bottomPanel"
-        app:layout_constraintDimensionRatio="1:1"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/toolbar"
-        app:layout_constraintWidth_percent="0.65" />
 
     <!-- entry box(bottm) -->
     <com.google.android.material.card.MaterialCardView

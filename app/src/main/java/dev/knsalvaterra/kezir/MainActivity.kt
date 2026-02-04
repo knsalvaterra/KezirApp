@@ -3,6 +3,7 @@ package dev.knsalvaterra.kezir
 import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
+import android.graphics.RectF
 import android.os.Build
 import android.os.Bundle
 import android.os.VibrationEffect
@@ -10,14 +11,20 @@ import android.os.Vibrator
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
+import android.util.Size
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.OptIn
 import androidx.appcompat.app.AppCompatActivity
-import androidx.camera.core.*
+import androidx.camera.core.CameraSelector
+import androidx.camera.core.ExperimentalGetImage
+import androidx.camera.core.ImageAnalysis
+import androidx.camera.core.ImageProxy
+import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.content.ContextCompat
+import androidx.core.graphics.toRectF
 import androidx.lifecycle.lifecycleScope
 import com.google.mlkit.vision.barcode.BarcodeScanner
 import com.google.mlkit.vision.barcode.BarcodeScannerOptions
@@ -35,11 +42,12 @@ class MainActivity : AppCompatActivity() {
     private lateinit var cameraExecutor: ExecutorService
     private lateinit var barcodeScanner: BarcodeScanner
     private lateinit var cameraProvider: ProcessCameraProvider
+    private lateinit var transparentRect: RectF
 
-    private var eventId :String? = null //"664544741697781760",
+    private var eventId: String? = null //"664544741697781760",
     private var currentSessionCookie: String? = null
 
-    private val cameraPermissionLauncher : ActivityResultLauncher<String> = registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
+    private val cameraPermissionLauncher: ActivityResultLauncher<String> = registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
         if (isGranted) {
             startCamera()
         } else {
@@ -48,7 +56,7 @@ class MainActivity : AppCompatActivity() {
 
     }
 
-//for now hardcoded
+    //for now hardcoded
     fun setEventId(eventId: String) {
         this@MainActivity.eventId = eventId
     }
@@ -94,13 +102,6 @@ class MainActivity : AppCompatActivity() {
 
         cameraScannerInit()
 
-
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
-            startCamera()
-        } else {
-            cameraPermissionLauncher.launch(Manifest.permission.CAMERA)
-        }
-
         binding.manualInput.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
@@ -112,7 +113,7 @@ class MainActivity : AppCompatActivity() {
             if (hasFocus && binding.manualInput.text.toString().trim().isEmpty()) {
 
                 binding.manualInput.setHint("Inserir código do Bilhete")
-            }  else
+            } else
                 binding.manualInput.setHint("")
 
         }
@@ -131,6 +132,29 @@ class MainActivity : AppCompatActivity() {
         }
         updateVerifyButtonState() // initial state
 
+        binding.viewFinder.post {
+            updateScannerOverlay(0.65f)
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
+                startCamera()
+            } else {
+                cameraPermissionLauncher.launch(Manifest.permission.CAMERA)
+            }
+        }
+
+    }
+
+    private fun updateScannerOverlay(sizePercentage: Float) {
+        val width = binding.viewFinder.width.toFloat()
+        val height = binding.viewFinder.height.toFloat()
+
+        val rectSize = width * sizePercentage
+        val left = (width - rectSize) / 2
+        val top = (height - rectSize) / 2
+        val right = left + rectSize
+        val bottom = top + rectSize
+
+        transparentRect = RectF(left, top, right, bottom)
+        binding.scannerOverlay.setTransparentRectangle(transparentRect)
     }
 
     //only if its a is number
@@ -150,9 +174,10 @@ class MainActivity : AppCompatActivity() {
             val preview = Preview.Builder().build().also {
                 it.setSurfaceProvider(binding.viewFinder.surfaceProvider) //set the background view (view panel )to the camera
             }
-           // preview.setSurfaceProvider(binding.viewFinder.surfaceProvider)
+            // preview.setSurfaceProvider(binding.viewFinder.surfaceProvider)
 
             val imageAnalysis = ImageAnalysis.Builder()
+                .setTargetResolution(Size(binding.viewFinder.width, binding.viewFinder.height))
                 .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
                 .build()
 
@@ -167,29 +192,48 @@ class MainActivity : AppCompatActivity() {
         }, ContextCompat.getMainExecutor(this))
     }
 
-    //process the image from the camera by googles ML scanner and get a QR code of it
-
-    //only for numbrs
     @OptIn(ExperimentalGetImage::class)
     private fun processImageProxy(imageProxy: ImageProxy) {
+        if (!::transparentRect.isInitialized) {
+            imageProxy.close()
+            return
+        }
+
         val mediaImage = imageProxy.image
-        if (mediaImage != null) {
-            val image = InputImage.fromMediaImage(mediaImage, imageProxy.imageInfo.rotationDegrees)
+        if (mediaImage == null) {
+            imageProxy.close()
+            return
+        }
+
+        try {
+            val rotationDegrees = imageProxy.imageInfo.rotationDegrees
+            val image = InputImage.fromMediaImage(mediaImage, rotationDegrees)
+
             barcodeScanner.process(image)
                 .addOnSuccessListener { barcodes ->
-                    val code = barcodes.firstOrNull()?.rawValue
-                    //only if number4
-                    if (code != null && binding.manualInput.text.toString() != code && code.trim().length == 6 && code.trim().all { it.isDigit() } ) {
-                        runOnUiThread {
-                            binding.manualInput.setText(code)
-
+                    for (barcode in barcodes) {
+                        barcode.boundingBox?.let { box ->
+                            if (transparentRect.contains(box.toRectF())) {
+                                val code = barcode.rawValue
+                                if (code != null && binding.manualInput.text.toString() != code && code.trim().length == 6 && code.trim().all { it.isDigit() }) {
+                                    runOnUiThread {
+                                        binding.manualInput.setText(code)
+                                        vibratePhone()
+                                    }
+                                    break // Exit after finding one valid barcode
+                                }
+                            }
                         }
                     }
                 }
-                .addOnCompleteListener {
+                .addOnFailureListener { e ->
+                    Log.e("Scanner", "Barcode scanning failed", e)
+                }
+                .addOnCompleteListener { // When processing is complete, close the imageProxy
                     imageProxy.close()
                 }
-        } else {
+        } catch (e: Exception) {
+            Log.e("Scanner", "Error in processImageProxy: ${e.message}", e)
             imageProxy.close()
         }
     }
@@ -267,11 +311,6 @@ class MainActivity : AppCompatActivity() {
     private fun isValidSession(): Boolean {
         return currentSessionCookie != null
     }
-
-
-
-
-
 
     override fun onDestroy() {
         super.onDestroy()

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="ScannerOverlayView">
+        <attr name="overlay_borderColor" format="color" />
+        <attr name="overlay_borderWidth" format="dimension" />
+        <attr name="overlay_cornerRadius" format="dimension" />
+        <attr name="overlay_cornerLengthRatio" format="float" />
+    </declare-styleable>
+</resources>
