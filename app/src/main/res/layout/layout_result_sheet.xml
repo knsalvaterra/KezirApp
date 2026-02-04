@@ -6,14 +6,14 @@
     android:orientation="vertical">
 
 
-    <!-- 1. Top Drag Handle -->
+    <!--top drag handle-->
     <com.google.android.material.bottomsheet.BottomSheetDragHandleView
         android:id="@+id/drag_handle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
 
-    <!-- 2. Status Header (Icon + Text) -->
+    <!--  status header (icon + text)-->
     <LinearLayout
         android:id="@+id/sheetHeaderBar"
         android:layout_width="match_parent"
@@ -41,7 +41,7 @@
             android:textStyle="bold" />
     </LinearLayout>
 
-    <!-- 3. Main Content Area -->
+    <!--main area -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="620dp"
@@ -49,7 +49,7 @@
         android:paddingHorizontal="24dp"
         android:paddingTop="16dp">
 
-        <!-- Buyer Info -->
+        <!-- client info -->
         <TextView
             android:id="@+id/buyerNameLabel"
             android:layout_width="wrap_content"
@@ -57,7 +57,9 @@
             android:text="Portador do Bilhete"
             android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
             android:textColor="?android:attr/textColorSecondary"
-            android:textSize="18sp" />
+            android:textAllCaps="true"
+
+       />
 
         <TextView
             android:id="@+id/sheetBuyerName"
@@ -68,7 +70,7 @@
             android:textAppearance="@style/TextAppearance.Material3.HeadlineMedium"
             android:textStyle="bold" />
 
-        <!-- Divider -->
+        <!--diuvider-->
         <View
             android:id="@+id/divider"
             android:layout_width="match_parent"
@@ -76,14 +78,14 @@
             android:layout_marginVertical="20dp"
             android:background="?attr/colorOutlineVariant" />
 
-        <!-- Dynamic Ticket Details -->
+        <!-- ticket details -->
         <LinearLayout
             android:id="@+id/ticketDetailsContainer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical" />
 
-        <!-- 3. Ticket List Section -->
+        <!-- ticket list section -->
         <TextView
             android:id="@+id/ticketsLabel"
             android:layout_width="wrap_content"
@@ -91,10 +93,11 @@
             android:layout_marginBottom="8dp"
             android:text="Detalhes do Bilhete"
             android:textAllCaps="true"
+
             android:textAppearance="@style/TextAppearance.Material3.LabelMedium"
             android:textColor="?android:attr/textColorSecondary" />
 
-        <!-- 4. Footer Message -->
+        <!-- additional info todo -->
         <TextView
             android:id="@+id/sheetMessage"
             android:layout_width="match_parent"
@@ -104,7 +107,7 @@
             android:textColor="?android:attr/textColorSecondary"
             android:textStyle="italic" />
 
-        <!-- Action Button -->
+        <!-- button -->
         <com.google.android.material.button.MaterialButton
             android:id="@+id/sheetCloseButton"
             style="@style/Widget.Material3.Button.TonalButton"

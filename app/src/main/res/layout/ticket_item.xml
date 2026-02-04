@@ -3,12 +3,13 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
-    android:paddingVertical="12dp"
+    android:paddingVertical="10dp"
     android:gravity="center_vertical">
+
 
     <TextView
         android:id="@+id/ticketName"
-        android:layout_width="6dp"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:textAppearance="@style/TextAppearance.Material3.BodyLarge"
@@ -23,8 +24,8 @@
         android:backgroundTint="#1A000000"
         android:paddingHorizontal="18dp"
         android:paddingVertical="8dp"
-        android:textAppearance="@style/TextAppearance.Material3.BodySmall"
-        android:textStyle="bold"
-        android:textColor="?attr/colorOnSurfaceVariant"/>
+        android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
+        android:textColor="?attr/colorOnSurfaceVariant"
+        android:textStyle="bold" />
 
 </LinearLayout>

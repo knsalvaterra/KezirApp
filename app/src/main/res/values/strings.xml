@@ -6,4 +6,5 @@
     <string name="login_error">Erro de login</string>
     <string name="camera_permission_denied">Permissão da câmera negada</string>
     <string name="invalid_qr_code">Codigo QR Invalido</string>
+    <string name="insert_hint">Problemas em scanear? Insira manualmente</string>
 </resources>

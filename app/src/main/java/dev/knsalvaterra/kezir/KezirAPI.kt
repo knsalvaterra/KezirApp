@@ -57,18 +57,19 @@ data class PinResponse(
 interface ApiService {
 
     @POST("api/box-office/verify-pin.php")
-    suspend fun verifyPin(
+    suspend fun verifyPin( //public Response<PinResponse> verifyPin(@Body PinRequest request);
         @Body request: PinRequest
     ): retrofit2.Response<PinResponse>
 
     @POST("api/box-office/verify-code.php")
-    suspend fun verifyCode(
+    suspend fun verifyCode( //public Response<VerifyResponse> verifyCode(@Header("Cookie") String sessionCookie, @Body VerifyRequest request);
         @Header("Cookie") sessionCookie: String,
         @Body request: VerifyRequest
     ): VerifyResponse
 }
-//singleton instance
+//singleton instance, Lazy<ApiService> api = Retrofit.Builder().baseUrl("https://stage.kezir.st/").addConverterFactory(GsonConverterFactory.create()).build().create(ApiService.class);
 object ApiClient {
+
     val api: ApiService by lazy {
         Retrofit.Builder()
             .baseUrl("https://stage.kezir.st/")

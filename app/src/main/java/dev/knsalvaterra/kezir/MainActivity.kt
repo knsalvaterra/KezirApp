@@ -35,7 +35,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var barcodeScanner: BarcodeScanner
     private lateinit var cameraProvider: ProcessCameraProvider
 
-    private val EVENT_ID = "664544741697781760" //"664544741697781760",
+    private var eventId = "" //"664544741697781760",
     private var currentSessionCookie: String? = null
 
     private val cameraPermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
@@ -44,8 +44,13 @@ class MainActivity : AppCompatActivity() {
         } else {
             Toast.makeText(this, getString(R.string.camera_permission_denied), Toast.LENGTH_LONG).show()
         }
+
     }
 
+//for now hardcoded
+    fun setEventId(eventId: String) {
+        this@MainActivity.eventId = eventId
+    }
 
 
     private fun vibratePhone(timeMillis: Long = 150) {
@@ -74,8 +79,12 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        //
 
-        login("4728", EVENT_ID)
+        setEventId("664544741697781760")
+
+
+        login("4728", eventId)
 
         //not do open the resst if not valid session todo
         if (!isValidSession()) {
@@ -98,6 +107,15 @@ class MainActivity : AppCompatActivity() {
                 updateVerifyButtonState()
             }
         })
+        binding.manualInput.setOnFocusChangeListener { _, hasFocus ->
+            if (hasFocus && binding.manualInput.text.toString().trim().isEmpty()) {
+
+                binding.manualInput.setHint("Inserir código do Bilhete")
+            }  else
+                binding.manualInput.setHint("")
+
+        }
+
 
         binding.scanButton.setOnClickListener {
 
@@ -129,8 +147,9 @@ class MainActivity : AppCompatActivity() {
             cameraProvider = cameraProviderFuture.get()
 
             val preview = Preview.Builder().build().also {
-                it.setSurfaceProvider(binding.viewFinder.surfaceProvider)
+                it.setSurfaceProvider(binding.viewFinder.surfaceProvider) //set the background view (view panel )to the camera
             }
+           // preview.setSurfaceProvider(binding.viewFinder.surfaceProvider)
 
             val imageAnalysis = ImageAnalysis.Builder()
                 .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
@@ -232,7 +251,7 @@ class MainActivity : AppCompatActivity() {
                 val request = PinRequest(pin, eventId)
                 val response = ApiClient.api.verifyPin(request)
                 if (response.isSuccessful && response.body()?.success == true) {
-                    currentSessionCookie = response.headers()["Set-Cookie"]?.split(";")?.get(0) //gather cookies
+                    currentSessionCookie = response.headers()["Set-Cookie"]?.split(";")?.get(0) //gather cookies seperated by ;
                 } else {
                     Toast.makeText(this@MainActivity, getString(R.string.invalid_pin), Toast.LENGTH_SHORT).show()
                 }
