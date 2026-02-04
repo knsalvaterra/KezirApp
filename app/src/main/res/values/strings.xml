@@ -5,7 +5,7 @@
     <string name="invalid_pin">PIN inválido</string>
     <string name="login_error">Erro de login</string>
     <string name="camera_permission_denied">Permissão da câmera negada</string>
-    <string name="invalid_qr_code">Codigo QR Invalido</string>
+    <string name="invalid_qr_code">Código QR inválido</string>
     <string name="insert_hint">Problemas em scanear? Insira manualmente</string>
     <string name="app_toolbar_title">Bilheteiria Kezir</string>
     <string name="status_ticket_valid">BILHETE VÁLIDO</string>

@@ -15,7 +15,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <dev.knsalvaterra.kezir.ScannerOverlayView
+    <dev.knsalvaterra.kezir.view.ScannerOverlayView
         android:id="@+id/scanner_overlay"
         android:layout_width="0dp"
         android:layout_height="0dp"
@@ -26,6 +26,7 @@
         app:overlay_borderColor="#FFFFFF"
         app:overlay_borderWidth="8dp"
         app:overlay_cornerRadius="16dp"
+        app:overlay_sizePercentage="0.65"
         app:overlay_cornerLengthRatio="0.1" />
 
     <!-- dark tint when theres no camera permissions -->

@@ -35,6 +35,7 @@ import dev.knsalvaterra.kezir.databinding.ActivityMainBinding
 import kotlinx.coroutines.launch
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
+import kotlin.math.min
 
 class MainActivity : AppCompatActivity() {
 
@@ -42,7 +43,9 @@ class MainActivity : AppCompatActivity() {
     private lateinit var cameraExecutor: ExecutorService
     private lateinit var barcodeScanner: BarcodeScanner
     private lateinit var cameraProvider: ProcessCameraProvider
-    private lateinit var transparentRect: RectF
+    private lateinit var scanArea: RectF
+    private var lastInvalidCode: String? = null
+    private var lastInvalidScanTime: Long = 0
 
     private var eventId: String? = null //"664544741697781760",
     private var currentSessionCookie: String? = null
@@ -122,7 +125,7 @@ class MainActivity : AppCompatActivity() {
         binding.scanButton.setOnClickListener {
 
             val manualCode = binding.manualInput.text.toString().trim()
-            if (manualCode.isNotEmpty()) {
+            if (manualCode.isNotEmpty() && validCodeFormat(manualCode)) {
                 verifyCode(manualCode)
                 runOnUiThread {
                     vibratePhone()
@@ -133,7 +136,7 @@ class MainActivity : AppCompatActivity() {
         updateVerifyButtonState() // initial state
 
         binding.viewFinder.post {
-            updateScannerOverlay(0.65f)
+            updateScannerOverlay(binding.scannerOverlay.sizePercentage())
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
                 startCamera()
             } else {
@@ -147,14 +150,14 @@ class MainActivity : AppCompatActivity() {
         val width = binding.viewFinder.width.toFloat()
         val height = binding.viewFinder.height.toFloat()
 
-        val rectSize = width * sizePercentage
+        val rectSize = min(width, height) * sizePercentage
         val left = (width - rectSize) / 2
         val top = (height - rectSize) / 2
         val right = left + rectSize
         val bottom = top + rectSize
 
-        transparentRect = RectF(left, top, right, bottom)
-        binding.scannerOverlay.setTransparentRectangle(transparentRect)
+        scanArea = RectF(left, top, right, bottom)
+        binding.scannerOverlay.setTransparentRectangle(scanArea)
     }
 
     //only if its a is number
@@ -191,10 +194,10 @@ class MainActivity : AppCompatActivity() {
             }
         }, ContextCompat.getMainExecutor(this))
     }
-
+//todo fix boundaries check not
     @OptIn(ExperimentalGetImage::class)
     private fun processImageProxy(imageProxy: ImageProxy) {
-        if (!::transparentRect.isInitialized) {
+        if (!::scanArea.isInitialized) {
             imageProxy.close()
             return
         }
@@ -212,15 +215,36 @@ class MainActivity : AppCompatActivity() {
             barcodeScanner.process(image)
                 .addOnSuccessListener { barcodes ->
                     for (barcode in barcodes) {
+
                         barcode.boundingBox?.let { box ->
-                            if (transparentRect.contains(box.toRectF())) {
+                            if (scanArea.contains(box.toRectF())) {
                                 val code = barcode.rawValue
-                                if (code != null && binding.manualInput.text.toString() != code && code.trim().length == 6 && code.trim().all { it.isDigit() }) {
-                                    runOnUiThread {
-                                        binding.manualInput.setText(code)
-                                        vibratePhone()
+                                if (code != null) {
+                                    if (binding.manualInput.text.toString() == code) {//no need to scan again
+                                        continue
                                     }
-                                    break // Exit after finding one valid barcode
+
+                                    if (validCodeFormat(code)) {
+                                        lastInvalidCode = null
+                                        runOnUiThread {
+                                            binding.manualInput.setText(code)
+                                            vibratePhone()
+                                        }
+                                        break
+                                    } else {
+                                        val now = System.currentTimeMillis()
+
+                                        if (lastInvalidCode != code || now - lastInvalidScanTime > 3000) { //3 seconds cooldown for invalid codes
+                                            lastInvalidCode = code
+                                            lastInvalidScanTime = now
+
+                                            runOnUiThread {
+
+                                                Toast.makeText(this@MainActivity, getString(R.string.invalid_qr_code), Toast.LENGTH_SHORT).show()
+                                                vibratePhone(75)
+                                            }
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -229,13 +253,17 @@ class MainActivity : AppCompatActivity() {
                 .addOnFailureListener { e ->
                     Log.e("Scanner", "Barcode scanning failed", e)
                 }
-                .addOnCompleteListener { // When processing is complete, close the imageProxy
+                .addOnCompleteListener {
                     imageProxy.close()
                 }
         } catch (e: Exception) {
             Log.e("Scanner", "Error in processImageProxy: ${e.message}", e)
             imageProxy.close()
         }
+    }
+
+    private fun validCodeFormat(code: String): Boolean {
+        return code.length == 6 && code.all { it.isDigit() }
     }
 
     private fun verifyCode(code: String) {
