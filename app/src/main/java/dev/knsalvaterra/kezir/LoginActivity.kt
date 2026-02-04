@@ -13,8 +13,11 @@ class LoginActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityLoginBinding
 
-
-    private val test = true
+    /**
+     * Set this flag to `false` to disable the login screen and use dev credentials.
+     * Set to `true` to show the login screen.
+     */
+    private val LOGIN_ENABLED = false // <-- TOGGLE FEATURE HERE
 
     // For dev mode
     private val DEV_EVENT_ID = "664544741697781760"
@@ -23,7 +26,7 @@ class LoginActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        if (test) {
+        if (LOGIN_ENABLED) {
             // Setup the UI for manual login
             setupManualLoginUI()
         } else {
@@ -33,7 +36,9 @@ class LoginActivity : AppCompatActivity() {
     }
 
     private fun bypassLogin() {
-
+        // Show a loading screen immediately to improve perceived startup time
+        setContentView(R.layout.activity_loading)
+        // Attempt to log in with dev credentials in the background
         login(DEV_PIN, DEV_EVENT_ID, isBypass = true)
     }
 
@@ -41,16 +46,12 @@ class LoginActivity : AppCompatActivity() {
         binding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // Long-press on the title to auto-fill credentials
-
-            binding.titleTextView.setOnLongClickListener {
-                Toast.makeText(this, "Dev Credentials Filled", Toast.LENGTH_SHORT).show()
-                binding.eventIdEditText.setText(DEV_EVENT_ID)
-                binding.pinEditText.setText(DEV_PIN)
-                login(DEV_PIN, DEV_EVENT_ID, isBypass = true)
-                true
-            }
-
+        // Dev mode helper: Long-press on the title to auto-login
+        binding.titleTextView.setOnLongClickListener {
+            Toast.makeText(this, "Dev Login", Toast.LENGTH_SHORT).show()
+            login(DEV_PIN, DEV_EVENT_ID)
+            true // Consume the long click
+        }
 
         binding.loginButton.setOnClickListener {
             val eventId = binding.eventIdEditText.text.toString()
@@ -59,7 +60,7 @@ class LoginActivity : AppCompatActivity() {
             if (eventId.isNotBlank() && pin.isNotBlank()) {
                 login(pin, eventId)
             } else {
-                Toast.makeText(this, "insira Event ID e PIN", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Please enter Event ID and PIN", Toast.LENGTH_SHORT).show()
             }
         }
     }
@@ -70,18 +71,12 @@ class LoginActivity : AppCompatActivity() {
                 val request = PinRequest(pin, eventId)
                 val response = ApiClient.api.verifyPin(request)
                 if (response.isSuccessful && response.body()?.success == true) {
-
-
                     val sessionCookie = response.headers()["Set-Cookie"]?.split(";")?.get(0)
-
-
                     val intent = Intent(this@LoginActivity, MainActivity::class.java).apply {
                         putExtra("EVENT_ID", eventId)
                         putExtra("SESSION_COOKIE", sessionCookie)
                     }
-
-
-                    startActivity(intent) //open the scanner
+                    startActivity(intent)
                     finish()
                 } else {
                     handleLoginFailure(isBypass)
