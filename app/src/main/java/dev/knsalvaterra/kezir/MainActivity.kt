@@ -1,4 +1,3 @@
-
 package dev.knsalvaterra.kezir
 
 import android.Manifest
@@ -48,7 +47,7 @@ class MainActivity : AppCompatActivity() {
     private var lastInvalidCode: String? = null
     private var lastInvalidScanTime: Long = 0
 
-    private var eventId: String? = null //"664544741697781760",
+    private var eventId: String? = null  //"664544741697781760",
     private var currentSessionCookie: String? = null
 
     private val cameraPermissionLauncher: ActivityResultLauncher<String> = registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
@@ -57,17 +56,9 @@ class MainActivity : AppCompatActivity() {
         } else {
             Toast.makeText(this, getString(R.string.camera_permission_denied), Toast.LENGTH_LONG).show()
         }
-
     }
-
-    //for now hardcoded
-    fun setEventId(eventId: String) {
-        this@MainActivity.eventId = eventId
-    }
-
 
     private fun vibratePhone(timeMillis: Long = 150) {
-
         val vibrator = getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             vibrator.vibrate(VibrationEffect.createOneShot(timeMillis, VibrationEffect.DEFAULT_AMPLITUDE))
@@ -77,7 +68,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    fun cameraScannerInit() {
+    private fun cameraScannerInit() {
         cameraExecutor = Executors.newSingleThreadExecutor()
 
         barcodeScanner = BarcodeScanning.getClient(
@@ -92,16 +83,13 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        //
+        eventId = intent.getStringExtra("EVENT_ID")
+        currentSessionCookie = intent.getStringExtra("SESSION_COOKIE")
 
-        setEventId("664544741697781760")
-
-
-        login("4728", eventId)
-
-        //not do open the resst if not valid session todo
         if (!isValidSession()) {
-
+            Toast.makeText(this, "Invalid session. Please login again.", Toast.LENGTH_LONG).show()
+            finish()
+            return
         }
 
         cameraScannerInit()
@@ -110,21 +98,20 @@ class MainActivity : AppCompatActivity() {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
             override fun afterTextChanged(s: Editable?) {
+
+
                 updateVerifyButtonState()
             }
         })
         binding.manualInput.setOnFocusChangeListener { _, hasFocus ->
             if (hasFocus && binding.manualInput.text.toString().trim().isEmpty()) {
-
-                binding.manualInput.setHint("Inserir código do Bilhete")
-            } else
-                binding.manualInput.setHint("")
-
+                binding.manualInput.hint = "Inserir código do Bilhete"
+            } else {
+                binding.manualInput.hint = ""
+            }
         }
 
-
         binding.scanButton.setOnClickListener {
-
             val manualCode = binding.manualInput.text.toString().trim()
             if (manualCode.isNotEmpty() && validCodeFormat(manualCode)) {
                 verifyCode(manualCode)
@@ -144,7 +131,6 @@ class MainActivity : AppCompatActivity() {
                 cameraPermissionLauncher.launch(Manifest.permission.CAMERA)
             }
         }
-
     }
 
     private fun updateScannerOverlay(sizePercentage: Float) {
@@ -161,11 +147,8 @@ class MainActivity : AppCompatActivity() {
         binding.scannerOverlay.setTransparentRectangle(scanArea)
     }
 
-    //only if its a is number
     private fun updateVerifyButtonState() {
-
         val isTextEntered = binding.manualInput.text.toString().trim().isNotEmpty()
-        //if the size of algs is 6 /cleaup
         val isSizeCorrect = binding.manualInput.text.toString().trim().length == 6
         binding.scanButton.isEnabled = isTextEntered && binding.manualInput.text.toString().trim().all { it.isDigit() } && isSizeCorrect
     }
@@ -176,9 +159,8 @@ class MainActivity : AppCompatActivity() {
             cameraProvider = cameraProviderFuture.get()
 
             val preview = Preview.Builder().build().also {
-                it.setSurfaceProvider(binding.viewFinder.surfaceProvider) //set the background view (view panel )to the camera
+                it.setSurfaceProvider(binding.viewFinder.surfaceProvider)
             }
-            // preview.setSurfaceProvider(binding.viewFinder.surfaceProvider)
 
             val imageAnalysis = ImageAnalysis.Builder()
                 .setTargetResolution(Size(binding.viewFinder.width, binding.viewFinder.height))
@@ -221,18 +203,15 @@ class MainActivity : AppCompatActivity() {
 
             barcodeScanner.process(image)
                 .addOnSuccessListener { barcodes ->
-
                     var scannedBarcode: Barcode? = null
-
                     for (barcode in barcodes) {
                         val boundingBox = barcode.boundingBox
                         if (boundingBox != null) {
                             val barcodeRect = boundingBox.toRectF()
-
-                            if (imageScanArea.intersect(barcodeRect)) { //intersect is not as strict and doesnt require to be completly inside the bounding box, contain require the code to be in the area
+                            if (imageScanArea.intersect(barcodeRect)) {
                                 scannedBarcode = barcode
                                 break
-                              }
+                            }
                         }
                     }
                     if (scannedBarcode != null) {
@@ -256,24 +235,20 @@ class MainActivity : AppCompatActivity() {
         val mediaImage = imageProxy.image ?: return RectF()
         val rotationDegrees = imageProxy.imageInfo.rotationDegrees
 
-        // Adjust dimensions for rotation
         val imageWidth = if (rotationDegrees == 90 || rotationDegrees == 270) mediaImage.height else mediaImage.width
         val imageHeight = if (rotationDegrees == 90 || rotationDegrees == 270) mediaImage.width else mediaImage.height
 
         val viewFinder = binding.viewFinder
         val viewWidth = viewFinder.width.toFloat()
         val viewHeight = viewFinder.height.toFloat()
-
-        // Compute scale factors, assuming FIT_CENTER scale type.
+        
         val scaleFactor = min(viewWidth / imageWidth, viewHeight / imageHeight)
-
-        // Calculate offsets to center the image in the view
+        
         val postScaleWidth = imageWidth * scaleFactor
         val postScaleHeight = imageHeight * scaleFactor
         val xOffset = (viewWidth - postScaleWidth) / 2f
         val yOffset = (viewHeight - postScaleHeight) / 2f
-
-        // Transform the on-screen scan area to the image's coordinate system
+        
         return RectF(
             (scanArea.left - xOffset) / scaleFactor,
             (scanArea.top - yOffset) / scaleFactor,
@@ -321,8 +296,7 @@ class MainActivity : AppCompatActivity() {
 
         lifecycleScope.launch {
             try {
-
-                // ApiClient.api.verifyCode(cookie, VerifyRequest(code, EVENT_ID))//
+                // val response = ApiClient.api.verifyCode(cookie, VerifyRequest(code, eventId))
                 val response = VerifyResponse(
                     success = true,
                     message = "Código verificado e marcado como resgatado!",
@@ -349,8 +323,6 @@ class MainActivity : AppCompatActivity() {
                 )
                 sheet.show(supportFragmentManager, "result")
                 binding.manualInput.text?.clear()
-                binding.manualInput.moveCursorToVisibleOffset()
-
             } catch (e: Exception) {
                 val sheet = TicketViewBottomSheet(
                     success = false,
@@ -364,24 +336,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun login(pin: String, eventId: String?) {
-        lifecycleScope.launch {
-            try {
-                val request = PinRequest(pin, eventId)
-                val response = ApiClient.api.verifyPin(request)
-                if (response.isSuccessful && response.body()?.success == true) {
-                    currentSessionCookie = response.headers()["Set-Cookie"]?.split(";")?.get(0) //gather cookies seperated by ;
-                } else {
-                    Toast.makeText(this@MainActivity, getString(R.string.invalid_pin), Toast.LENGTH_SHORT).show()
-                }
-            } catch (e: Exception) {
-                Log.e("Auth", "Login failed", e)
-                Toast.makeText(this@MainActivity, getString(R.string.login_error), Toast.LENGTH_SHORT).show()
-            }
-        }
-    }
-
-    //function to check if is valid (cgecks the cookies if its not null
     private fun isValidSession(): Boolean {
         return currentSessionCookie != null
     }
