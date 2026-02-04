@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_toolbar_title">Bilheteiria Kezir</string>
+    <string name="status_ticket_valid">BILHETE VÁLIDO</string>
+    <string name="status_ticket_invalid">BILHETE INVÁLIDO</string>
+</resources>

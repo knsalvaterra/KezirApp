@@ -11,6 +11,7 @@ import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
 import android.widget.Toast
+import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.OptIn
 import androidx.appcompat.app.AppCompatActivity
@@ -35,10 +36,10 @@ class MainActivity : AppCompatActivity() {
     private lateinit var barcodeScanner: BarcodeScanner
     private lateinit var cameraProvider: ProcessCameraProvider
 
-    private var eventId = "" //"664544741697781760",
+    private var eventId :String? = null //"664544741697781760",
     private var currentSessionCookie: String? = null
 
-    private val cameraPermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
+    private val cameraPermissionLauncher : ActivityResultLauncher<String> = registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
         if (isGranted) {
             startCamera()
         } else {
@@ -222,7 +223,7 @@ class MainActivity : AppCompatActivity() {
                     )
                 )
 
-                val sheet = ResultBottomSheet(
+                val sheet = TicketViewBottomSheet(
                     success = response.success,
                     message = response.message ?: "",
                     order = response.order,
@@ -233,7 +234,7 @@ class MainActivity : AppCompatActivity() {
                 binding.manualInput.moveCursorToVisibleOffset()
 
             } catch (e: Exception) {
-                val sheet = ResultBottomSheet(
+                val sheet = TicketViewBottomSheet(
                     success = false,
                     message = getString(R.string.invalid_ticket_or_connection_error),
                     order = null,
@@ -245,7 +246,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun login(pin: String, eventId: String) {
+    private fun login(pin: String, eventId: String?) {
         lifecycleScope.launch {
             try {
                 val request = PinRequest(pin, eventId)

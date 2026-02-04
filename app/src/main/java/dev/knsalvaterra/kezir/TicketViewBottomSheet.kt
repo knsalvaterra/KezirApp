@@ -6,17 +6,15 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.core.graphics.toColorInt
-import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDragHandleView
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.button.MaterialButton
 
-class ResultBottomSheet(
+class TicketViewBottomSheet(
     private val success: Boolean,
     private val message: String,
     private val order: Order?,
@@ -24,7 +22,7 @@ class ResultBottomSheet(
 ) : BottomSheetDialogFragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.layout_result_sheet, container, true)
+        return inflater.inflate(R.layout.layout_ticket_sheet, container, true)
     }
 
 
@@ -59,7 +57,8 @@ class ResultBottomSheet(
             header.setBackgroundColor(successColor)
             dragHandle.backgroundTintList = ColorStateList.valueOf(successColor)
 
-            statusText.text = "BILHETE VÁLIDO"
+
+            statusText.text = getString(R.string.status_ticket_valid)
             statusIcon.setImageResource(R.drawable.ic_success)
             statusIcon.setColorFilter(Color.WHITE)
             btn.setBackgroundColor(Color.parseColor("#39966B"))
@@ -73,6 +72,7 @@ class ResultBottomSheet(
                 val ticketView = layoutInflater.inflate(R.layout.ticket_item, ticketDetailsContainer, false)
                 ticketView.findViewById<TextView>(R.id.ticketName).text = ticket.ticket_name
                 ticketView.findViewById<TextView>(R.id.ticketQuantity).text = "x${ticket.quantity}"
+
                 ticketDetailsContainer.addView(ticketView)
             }
         } else {
@@ -80,7 +80,7 @@ class ResultBottomSheet(
             val errorColor = Color.parseColor("#E53935")
             header.setBackgroundColor(errorColor)
             dragHandle.backgroundTintList = ColorStateList.valueOf(errorColor)
-            statusText.text = "BILHETE INVÁLIDO"
+            statusText.text = getString(R.string.status_ticket_invalid)
             statusIcon.setImageResource(R.drawable.ic_error)
             statusIcon.setColorFilter(Color.WHITE)
             btn.setBackgroundColor(errorColor)

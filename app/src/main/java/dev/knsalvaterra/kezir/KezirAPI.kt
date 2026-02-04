@@ -46,7 +46,7 @@ data class Ticket(
 
 data class PinRequest(
     val pin: String,
-    val event_id: String
+    val event_id: String?
 )
 
 data class PinResponse(
