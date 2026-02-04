@@ -1,5 +1,6 @@
 package dev.knsalvaterra.kezir
 
+import android.content.res.ColorStateList
 import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -9,10 +10,11 @@ import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.core.graphics.toColorInt
 import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.android.material.bottomsheet.BottomSheetDragHandleView
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.button.MaterialButton
-import androidx.core.graphics.toColorInt
 
 class ResultBottomSheet(
     private val success: Boolean,
@@ -24,6 +26,8 @@ class ResultBottomSheet(
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.layout_result_sheet, container, true)
     }
+
+
 
     override fun onStart() {
         super.onStart()
@@ -39,6 +43,7 @@ class ResultBottomSheet(
         super.onViewCreated(view, savedInstanceState)
 
         val header = view.findViewById<View>(R.id.sheetHeaderBar)
+        val dragHandle = view.findViewById<BottomSheetDragHandleView>(R.id.drag_handle)
 
         val statusText = view.findViewById<TextView>(R.id.sheetStatusText)
         val statusIcon = view.findViewById<ImageView>(R.id.statusIcon)
@@ -50,7 +55,10 @@ class ResultBottomSheet(
 
         if (success && order != null) {
             // Success Style
-            header.setBackgroundColor("#31815C".toColorInt())
+            val successColor = "#31815C".toColorInt()
+            header.setBackgroundColor(successColor)
+            dragHandle.backgroundTintList = ColorStateList.valueOf(successColor)
+
             statusText.text = "BILHETE VÁLIDO"
             statusIcon.setImageResource(R.drawable.ic_success)
             statusIcon.setColorFilter(Color.WHITE)
@@ -69,11 +77,13 @@ class ResultBottomSheet(
             }
         } else {
             // Error Style
-            header.setBackgroundColor(Color.parseColor("#E53935"))
+            val errorColor = Color.parseColor("#E53935")
+            header.setBackgroundColor(errorColor)
+            dragHandle.backgroundTintList = ColorStateList.valueOf(errorColor)
             statusText.text = "BILHETE INVÁLIDO"
             statusIcon.setImageResource(R.drawable.ic_error)
             statusIcon.setColorFilter(Color.WHITE)
-            btn.setBackgroundColor(Color.parseColor("#E53935"))
+            btn.setBackgroundColor(errorColor)
             btn.text = "TENTAR NOVAMENTE"
 
             buyerName.text = "Erro na Validação"
@@ -82,7 +92,10 @@ class ResultBottomSheet(
             ticketDetailsContainer.visibility = View.GONE
         }
 
-        btn.setOnClickListener { dismiss() }
+        btn.setOnClickListener {
+
+            dismiss()
+        }
     }
 
     override fun getTheme(): Int = R.style.CustomBottomSheetDialogTheme

@@ -6,6 +6,23 @@ import retrofit2.http.Body
 import retrofit2.http.Header
 import retrofit2.http.POST
 
+
+//{
+//    "success": true,
+//    "message": "Código verificado e marcado como resgatado!",
+//    "order": {
+//    "buyer_name": "Dalila Rita",
+//    "buyer_phone": "+2399974821",
+//    "tickets": [
+//    {
+//        "ticket_type": "vip",
+//        "ticket_name": "Normal",
+//        "table_capacity": null,
+//        "quantity": "4"
+//    }
+//    ]
+//}
+//}
 data class VerifyRequest(
     val code: String,
     val event_id: String
@@ -57,6 +74,6 @@ object ApiClient {
             .baseUrl("https://stage.kezir.st/")
             .addConverterFactory(GsonConverterFactory.create())
             .build()
-            .create(ApiService::class.java)
+            .create(ApiService::class.java) //JSON -> object
     }
 }

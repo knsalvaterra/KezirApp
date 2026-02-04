@@ -8,6 +8,7 @@
 
     <!-- 1. Top Drag Handle -->
     <com.google.android.material.bottomsheet.BottomSheetDragHandleView
+        android:id="@+id/drag_handle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
@@ -17,7 +18,7 @@
         android:id="@+id/sheetHeaderBar"
         android:layout_width="match_parent"
         android:layout_height="62dp"
-        android:gravity="center_vertical"
+        android:gravity="center"
         android:orientation="horizontal"
         android:paddingHorizontal="24dp"
         android:paddingVertical="8dp">
@@ -36,7 +37,7 @@
             android:layout_marginStart="12dp"
             android:text="VERIFICADO"
             android:textAppearance="@style/TextAppearance.Material3.TitleLarge"
-            android:textColor="#39966B"
+            android:textColor="#FFFFFF"
             android:textStyle="bold" />
     </LinearLayout>
 

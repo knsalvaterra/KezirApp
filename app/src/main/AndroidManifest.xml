@@ -14,7 +14,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Material3.DayNight.NoActionBar"
-        android:label="Bilhetes">
+        android:label="Kezir App">
 
         <activity
             android:name=".MainActivity"

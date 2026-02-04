@@ -21,6 +21,7 @@ import androidx.lifecycle.lifecycleScope
 import com.google.mlkit.vision.barcode.BarcodeScanner
 import com.google.mlkit.vision.barcode.BarcodeScannerOptions
 import com.google.mlkit.vision.barcode.BarcodeScanning
+import com.google.mlkit.vision.barcode.common.Barcode
 import com.google.mlkit.vision.common.InputImage
 import dev.knsalvaterra.kezir.databinding.ActivityMainBinding
 import kotlinx.coroutines.launch
@@ -34,19 +35,21 @@ class MainActivity : AppCompatActivity() {
     private lateinit var barcodeScanner: BarcodeScanner
     private lateinit var cameraProvider: ProcessCameraProvider
 
-    private val EVENT_ID = "664544741697781760"
+    private val EVENT_ID = "664544741697781760" //"664544741697781760",
     private var currentSessionCookie: String? = null
-    private var lastDetectedQrCode: String? = null
 
     private val cameraPermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
         if (isGranted) {
             startCamera()
         } else {
-            Toast.makeText(this, getString(R.string.camera_permission_denied), Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, getString(R.string.camera_permission_denied), Toast.LENGTH_LONG).show()
         }
     }
 
+
+
     private fun vibratePhone(timeMillis: Long = 150) {
+
         val vibrator = getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             vibrator.vibrate(VibrationEffect.createOneShot(timeMillis, VibrationEffect.DEFAULT_AMPLITUDE))
@@ -56,20 +59,31 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    fun cameraScannerInit() {
+        cameraExecutor = Executors.newSingleThreadExecutor()
+
+        barcodeScanner = BarcodeScanning.getClient(
+            BarcodeScannerOptions.Builder()
+                .setBarcodeFormats(Barcode.FORMAT_QR_CODE)
+                .build()
+        )
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        cameraExecutor = Executors.newSingleThreadExecutor()
-
-        barcodeScanner = BarcodeScanning.getClient(
-            BarcodeScannerOptions.Builder()
-                .setBarcodeFormats(com.google.mlkit.vision.barcode.common.Barcode.FORMAT_QR_CODE)
-                .build()
-        )
 
         login("4728", EVENT_ID)
+
+        //not do open the resst if not valid session todo
+        if (!isValidSession()) {
+
+        }
+
+        cameraScannerInit()
+
 
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
             startCamera()
@@ -81,20 +95,32 @@ class MainActivity : AppCompatActivity() {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
             override fun afterTextChanged(s: Editable?) {
-                binding.scanButton.isEnabled = !s.isNullOrBlank() || lastDetectedQrCode != null
+                updateVerifyButtonState()
             }
         })
 
         binding.scanButton.setOnClickListener {
-            vibratePhone()
+
             val manualCode = binding.manualInput.text.toString().trim()
             if (manualCode.isNotEmpty()) {
                 verifyCode(manualCode)
-            } else if (lastDetectedQrCode != null) {
-                verifyCode(lastDetectedQrCode!!)
-                lastDetectedQrCode = null // Consume the code
+                runOnUiThread {
+                    vibratePhone()
+                }
+                binding.manualInput.text?.clear()
             }
         }
+        updateVerifyButtonState() // initial state
+
+    }
+
+    //only if its a is number
+    private fun updateVerifyButtonState() {
+
+        val isTextEntered = binding.manualInput.text.toString().trim().isNotEmpty()
+        //if the size of algs is 6 /cleaup
+        val isSizeCorrect = binding.manualInput.text.toString().trim().length == 6
+        binding.scanButton.isEnabled = isTextEntered && binding.manualInput.text.toString().trim().all { it.isDigit() } && isSizeCorrect
     }
 
     private fun startCamera() {
@@ -121,6 +147,9 @@ class MainActivity : AppCompatActivity() {
         }, ContextCompat.getMainExecutor(this))
     }
 
+    //process the image from the camera by googles ML scanner and get a QR code of it
+
+    //only for numbrs
     @OptIn(ExperimentalGetImage::class)
     private fun processImageProxy(imageProxy: ImageProxy) {
         val mediaImage = imageProxy.image
@@ -128,24 +157,14 @@ class MainActivity : AppCompatActivity() {
             val image = InputImage.fromMediaImage(mediaImage, imageProxy.imageInfo.rotationDegrees)
             barcodeScanner.process(image)
                 .addOnSuccessListener { barcodes ->
-                    val isTextEntered = binding.manualInput.text.toString().trim().isNotEmpty()
-                    if (barcodes.isNotEmpty()) {
-                        val code = barcodes.firstOrNull()?.rawValue
-                        if (code != null && code.all { it.isDigit() }) {
-                            lastDetectedQrCode = code
-                            binding.scanButton.isEnabled = true
-                        } else {
-                            lastDetectedQrCode = null
-                            binding.scanButton.isEnabled = isTextEntered
+                    val code = barcodes.firstOrNull()?.rawValue
+                    //only if number4
+                    if (code != null && binding.manualInput.text.toString() != code && code.trim().length == 6 && code.trim().all { it.isDigit() } ) {
+                        runOnUiThread {
+                            binding.manualInput.setText(code)
+
                         }
-                    } else {
-                        lastDetectedQrCode = null
-                        binding.scanButton.isEnabled = isTextEntered
                     }
-                }
-                .addOnFailureListener {
-                    lastDetectedQrCode = null
-                    binding.scanButton.isEnabled = binding.manualInput.text.toString().trim().isNotEmpty()
                 }
                 .addOnCompleteListener {
                     imageProxy.close()
@@ -156,13 +175,16 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun verifyCode(code: String) {
+        binding.manualInput.text?.clear()
         val cookie = currentSessionCookie ?: run {
-            Toast.makeText(this, getString(R.string.unauthenticated), Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, getString(R.string.unauthenticated), Toast.LENGTH_LONG).show()
             return
         }
 
         lifecycleScope.launch {
             try {
+
+                // ApiClient.api.verifyCode(cookie, VerifyRequest(code, EVENT_ID))//
                 val response = VerifyResponse(
                     success = true,
                     message = "Código verificado e marcado como resgatado!",
@@ -189,6 +211,7 @@ class MainActivity : AppCompatActivity() {
                 )
                 sheet.show(supportFragmentManager, "result")
                 binding.manualInput.text?.clear()
+                binding.manualInput.moveCursorToVisibleOffset()
 
             } catch (e: Exception) {
                 val sheet = ResultBottomSheet(
@@ -206,9 +229,10 @@ class MainActivity : AppCompatActivity() {
     private fun login(pin: String, eventId: String) {
         lifecycleScope.launch {
             try {
-                val response = ApiClient.api.verifyPin(PinRequest(pin, eventId))
+                val request = PinRequest(pin, eventId)
+                val response = ApiClient.api.verifyPin(request)
                 if (response.isSuccessful && response.body()?.success == true) {
-                    currentSessionCookie = response.headers()["Set-Cookie"]?.split(";")?.get(0)
+                    currentSessionCookie = response.headers()["Set-Cookie"]?.split(";")?.get(0) //gather cookies
                 } else {
                     Toast.makeText(this@MainActivity, getString(R.string.invalid_pin), Toast.LENGTH_SHORT).show()
                 }
@@ -218,6 +242,16 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
+
+    //function to check if is valid (cgecks the cookies if its not null
+    private fun isValidSession(): Boolean {
+        return currentSessionCookie != null
+    }
+
+
+
+
+
 
     override fun onDestroy() {
         super.onDestroy()
