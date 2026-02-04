@@ -230,6 +230,8 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+
+    //androidstudiox library
     @OptIn(ExperimentalGetImage::class)
     private fun getTransformedScanArea(imageProxy: ImageProxy): RectF {
         val mediaImage = imageProxy.image ?: return RectF()

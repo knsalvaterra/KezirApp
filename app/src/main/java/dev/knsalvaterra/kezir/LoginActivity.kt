@@ -6,7 +6,6 @@ import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
-import com.google.android.datatransport.BuildConfig
 import dev.knsalvaterra.kezir.databinding.ActivityLoginBinding
 import kotlinx.coroutines.launch
 
@@ -14,25 +13,44 @@ class LoginActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityLoginBinding
 
+
+    private val test = true
+
     // For dev mode
     private val DEV_EVENT_ID = "664544741697781760"
     private val DEV_PIN = "4728"
 
-    private val debug = true
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        if (test) {
+            // Setup the UI for manual login
+            setupManualLoginUI()
+        } else {
+            // Bypass login UI and use dev credentials
+            bypassLogin()
+        }
+    }
+
+    private fun bypassLogin() {
+
+        login(DEV_PIN, DEV_EVENT_ID, isBypass = true)
+    }
+
+    private fun setupManualLoginUI() {
         binding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // Dev mode: Long-press on the title to auto-login
-        if (debug) {
+        // Long-press on the title to auto-fill credentials
+
             binding.titleTextView.setOnLongClickListener {
-                Toast.makeText(this, "Dev Login", Toast.LENGTH_SHORT).show()
-                login(DEV_PIN, DEV_EVENT_ID)
-                true // Consume the long click
+                Toast.makeText(this, "Dev Credentials Filled", Toast.LENGTH_SHORT).show()
+                binding.eventIdEditText.setText(DEV_EVENT_ID)
+                binding.pinEditText.setText(DEV_PIN)
+                login(DEV_PIN, DEV_EVENT_ID, isBypass = true)
+                true
             }
-        }
+
 
         binding.loginButton.setOnClickListener {
             val eventId = binding.eventIdEditText.text.toString()
@@ -41,31 +59,49 @@ class LoginActivity : AppCompatActivity() {
             if (eventId.isNotBlank() && pin.isNotBlank()) {
                 login(pin, eventId)
             } else {
-                Toast.makeText(this, "Please enter Event ID and PIN", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "insira Event ID e PIN", Toast.LENGTH_SHORT).show()
             }
         }
     }
 
-    private fun login(pin: String, eventId: String) {
+    private fun login(pin: String, eventId: String, isBypass: Boolean = false) {
         lifecycleScope.launch {
             try {
                 val request = PinRequest(pin, eventId)
                 val response = ApiClient.api.verifyPin(request)
                 if (response.isSuccessful && response.body()?.success == true) {
+
+
                     val sessionCookie = response.headers()["Set-Cookie"]?.split(";")?.get(0)
+
+
                     val intent = Intent(this@LoginActivity, MainActivity::class.java).apply {
                         putExtra("EVENT_ID", eventId)
                         putExtra("SESSION_COOKIE", sessionCookie)
                     }
-                    startActivity(intent)
+
+
+                    startActivity(intent) //open the scanner
                     finish()
                 } else {
-                    Toast.makeText(this@LoginActivity, getString(R.string.invalid_pin), Toast.LENGTH_SHORT).show()
+                    handleLoginFailure(isBypass)
                 }
             } catch (e: Exception) {
                 Log.e("Auth", "Login failed", e)
-                Toast.makeText(this@LoginActivity, getString(R.string.login_error), Toast.LENGTH_SHORT).show()
+                handleLoginFailure(isBypass)
             }
+        }
+    }
+
+    private fun handleLoginFailure(isBypass: Boolean) {
+        if (isBypass) {
+            // If the bypass fails, show the regular login screen as a fallback
+            Toast.makeText(this@LoginActivity, "Dev login failed, showing manual login.", Toast.LENGTH_LONG).show()
+            runOnUiThread {
+                setupManualLoginUI()
+            }
+        } else {
+            Toast.makeText(this@LoginActivity, getString(R.string.invalid_pin), Toast.LENGTH_SHORT).show()
         }
     }
 }
