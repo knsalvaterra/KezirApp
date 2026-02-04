@@ -1,3 +1,4 @@
+
 package dev.knsalvaterra.kezir
 
 import android.Manifest
@@ -194,64 +195,52 @@ class MainActivity : AppCompatActivity() {
             }
         }, ContextCompat.getMainExecutor(this))
     }
-//todo fix boundaries check not
+
     @OptIn(ExperimentalGetImage::class)
     private fun processImageProxy(imageProxy: ImageProxy) {
-        if (!::scanArea.isInitialized) {
+        if (!::scanArea.isInitialized || imageProxy.image == null) {
             imageProxy.close()
             return
         }
 
-        val mediaImage = imageProxy.image
-        if (mediaImage == null) {
+        val imageScanArea = getTransformedScanArea(imageProxy)
+        if (imageScanArea.isEmpty) {
             imageProxy.close()
             return
         }
 
         try {
-            val rotationDegrees = imageProxy.imageInfo.rotationDegrees
-            val image = InputImage.fromMediaImage(mediaImage, rotationDegrees)
+            val mediaImage = imageProxy.image
+            if (mediaImage == null) {
+                imageProxy.close()
+                return
+            }
+
+            val rotation = imageProxy.imageInfo.rotationDegrees
+            val image = InputImage.fromMediaImage(mediaImage, rotation)
 
             barcodeScanner.process(image)
                 .addOnSuccessListener { barcodes ->
+
+                    var scannedBarcode: Barcode? = null
+
                     for (barcode in barcodes) {
+                        val boundingBox = barcode.boundingBox
+                        if (boundingBox != null) {
+                            val barcodeRect = boundingBox.toRectF()
 
-                        barcode.boundingBox?.let { box ->
-                            if (scanArea.contains(box.toRectF())) {
-                                val code = barcode.rawValue
-                                if (code != null) {
-                                    if (binding.manualInput.text.toString() == code) {//no need to scan again
-                                        continue
-                                    }
-
-                                    if (validCodeFormat(code)) {
-                                        lastInvalidCode = null
-                                        runOnUiThread {
-                                            binding.manualInput.setText(code)
-                                            vibratePhone()
-                                        }
-                                        break
-                                    } else {
-                                        val now = System.currentTimeMillis()
-
-                                        if (lastInvalidCode != code || now - lastInvalidScanTime > 3000) { //3 seconds cooldown for invalid codes
-                                            lastInvalidCode = code
-                                            lastInvalidScanTime = now
-
-                                            runOnUiThread {
-
-                                                Toast.makeText(this@MainActivity, getString(R.string.invalid_qr_code), Toast.LENGTH_SHORT).show()
-                                                vibratePhone(75)
-                                            }
-                                        }
-                                    }
-                                }
-                            }
+                            if (imageScanArea.intersect(barcodeRect)) { //intersect is not as strict and doesnt require to be completly inside the bounding box, contain require the code to be in the area
+                                scannedBarcode = barcode
+                                break
+                              }
                         }
                     }
+                    if (scannedBarcode != null) {
+                        handleScannedBarcode(scannedBarcode)
+                    }
                 }
-                .addOnFailureListener { e ->
-                    Log.e("Scanner", "Barcode scanning failed", e)
+                .addOnFailureListener { exception ->
+                    Log.e("Scanner", "Barcode scanning failed", exception)
                 }
                 .addOnCompleteListener {
                     imageProxy.close()
@@ -259,6 +248,63 @@ class MainActivity : AppCompatActivity() {
         } catch (e: Exception) {
             Log.e("Scanner", "Error in processImageProxy: ${e.message}", e)
             imageProxy.close()
+        }
+    }
+
+    @OptIn(ExperimentalGetImage::class)
+    private fun getTransformedScanArea(imageProxy: ImageProxy): RectF {
+        val mediaImage = imageProxy.image ?: return RectF()
+        val rotationDegrees = imageProxy.imageInfo.rotationDegrees
+
+        // Adjust dimensions for rotation
+        val imageWidth = if (rotationDegrees == 90 || rotationDegrees == 270) mediaImage.height else mediaImage.width
+        val imageHeight = if (rotationDegrees == 90 || rotationDegrees == 270) mediaImage.width else mediaImage.height
+
+        val viewFinder = binding.viewFinder
+        val viewWidth = viewFinder.width.toFloat()
+        val viewHeight = viewFinder.height.toFloat()
+
+        // Compute scale factors, assuming FIT_CENTER scale type.
+        val scaleFactor = min(viewWidth / imageWidth, viewHeight / imageHeight)
+
+        // Calculate offsets to center the image in the view
+        val postScaleWidth = imageWidth * scaleFactor
+        val postScaleHeight = imageHeight * scaleFactor
+        val xOffset = (viewWidth - postScaleWidth) / 2f
+        val yOffset = (viewHeight - postScaleHeight) / 2f
+
+        // Transform the on-screen scan area to the image's coordinate system
+        return RectF(
+            (scanArea.left - xOffset) / scaleFactor,
+            (scanArea.top - yOffset) / scaleFactor,
+            (scanArea.right - xOffset) / scaleFactor,
+            (scanArea.bottom - yOffset) / scaleFactor
+        )
+    }
+
+    private fun handleScannedBarcode(barcode: Barcode) {
+        val code = barcode.rawValue ?: return
+
+        if (binding.manualInput.text.toString() == code) {
+            return
+        }
+
+        if (validCodeFormat(code)) {
+            lastInvalidCode = null
+            runOnUiThread {
+                binding.manualInput.setText(code)
+                vibratePhone()
+            }
+        } else {
+            val now = System.currentTimeMillis()
+            if (lastInvalidCode != code || now - lastInvalidScanTime > 3000) { // 3-second cooldown
+                lastInvalidCode = code
+                lastInvalidScanTime = now
+                runOnUiThread {
+                    Toast.makeText(this, getString(R.string.invalid_qr_code), Toast.LENGTH_SHORT).show()
+                    vibratePhone(75)
+                }
+            }
         }
     }
 
