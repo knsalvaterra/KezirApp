@@ -14,7 +14,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Material3.DayNight.NoActionBar"
-        android:label="Kezir App">
+        android:label="Kezir">
 
         <activity
             android:name=".LoginActivity"

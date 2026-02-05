@@ -13,6 +13,8 @@ import android.view.View
 import dev.knsalvaterra.kezir.R
 import kotlin.math.min
 
+
+//Androidx UI Library
 class ScannerOverlayView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,

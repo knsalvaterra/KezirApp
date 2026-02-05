@@ -35,6 +35,24 @@
         android:layout_height="match_parent"
         android:background="#4D000000" />
 
+    <TextView
+        android:id="@+id/qrCodeLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+
+        android:background="@drawable/label_background"
+        android:paddingHorizontal="16dp"
+        android:paddingVertical="8dp"
+
+        android:text="@string/scan_qr_code_label"
+
+        android:textSize="16sp"
+        android:layout_marginTop="182dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/scanner_overlay"
+        app:layout_constraintVertical_bias="0.2" />
+
     <!-- app top, back button todo-->
     <!--     app:navigationIcon="?attr/homeAsUpIndicator"
         app:navigationIconTint="#FFFFFF"
@@ -48,7 +66,8 @@
         app:title="@string/app_toolbar_title"
         app:titleCentered="true"
         app:titleTextAppearance="@style/TextAppearance.Material3.TitleLarge"
-        app:titleTextColor="#FFFFFF" />
+        app:titleTextColor="#FFFFFF"/>
+
 
     <!-- entry box(bottm) -->
     <com.google.android.material.card.MaterialCardView
@@ -96,6 +115,7 @@
                     android:background="@drawable/input_bg_rounded"
                     android:hint="Inserir código do Bilhete"
                     android:textColor="#49454F"
+                    app:hintTextColor="#5B5B5B"
                     android:inputType="number"
                     android:maxLines="1" />
             </com.google.android.material.textfield.TextInputLayout>

@@ -22,6 +22,9 @@ import androidx.camera.core.ExperimentalGetImage
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageProxy
 import androidx.camera.core.Preview
+import androidx.camera.core.impl.utils.ResolutionSelectorUtil
+import androidx.camera.core.resolutionselector.ResolutionSelector
+import androidx.camera.core.resolutionselector.ResolutionStrategy
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.toRectF
@@ -31,6 +34,9 @@ import com.google.mlkit.vision.barcode.BarcodeScannerOptions
 import com.google.mlkit.vision.barcode.BarcodeScanning
 import com.google.mlkit.vision.barcode.common.Barcode
 import com.google.mlkit.vision.common.InputImage
+import dev.knsalvaterra.kezir.api.TicketManager
+import dev.knsalvaterra.kezir.api.TicketResult
+
 import dev.knsalvaterra.kezir.databinding.ActivityMainBinding
 import kotlinx.coroutines.launch
 import java.util.concurrent.ExecutorService
@@ -47,7 +53,7 @@ class MainActivity : AppCompatActivity() {
     private var lastInvalidCode: String? = null
     private var lastInvalidScanTime: Long = 0
 
-    private var eventId: String? = null  //"664544741697781760",
+    private var eventId: String? = null
     private var currentSessionCookie: String? = null
 
     private val cameraPermissionLauncher: ActivityResultLauncher<String> = registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
@@ -86,8 +92,10 @@ class MainActivity : AppCompatActivity() {
         eventId = intent.getStringExtra("EVENT_ID")
         currentSessionCookie = intent.getStringExtra("SESSION_COOKIE")
 
+
+
         if (!isValidSession()) {
-            Toast.makeText(this, "Invalid session. Please login again.", Toast.LENGTH_LONG).show()
+            Toast.makeText(this, "Sessão Invalida. Tente novamente", Toast.LENGTH_LONG).show()
             finish()
             return
         }
@@ -98,33 +106,39 @@ class MainActivity : AppCompatActivity() {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
             override fun afterTextChanged(s: Editable?) {
-
-
-                updateVerifyButtonState()
+                updateButtonState()
             }
         })
         binding.manualInput.setOnFocusChangeListener { _, hasFocus ->
             if (hasFocus && binding.manualInput.text.toString().trim().isEmpty()) {
-                binding.manualInput.hint = "Inserir código do Bilhete"
+              //  binding.manualInput.hint = "Inserir código do Bilhete"
             } else {
-                binding.manualInput.hint = ""
+              //  binding.manualInput.hint = ""
             }
         }
 
         binding.scanButton.setOnClickListener {
-            val manualCode = binding.manualInput.text.toString().trim()
-            if (manualCode.isNotEmpty() && validCodeFormat(manualCode)) {
-                verifyCode(manualCode)
+            val code = binding.manualInput.text.toString().trim()
+            if (code.isNotEmpty() && validCodeFormat(code)) {
+                verifyCode(code)
                 runOnUiThread {
                     vibratePhone()
                 }
                 binding.manualInput.text?.clear()
             }
         }
-        updateVerifyButtonState() // initial state
+        updateButtonState() // initial state
 
         binding.viewFinder.post {
             updateScannerOverlay(binding.scannerOverlay.sizePercentage())
+
+            binding.scannerOverlay.setOnClickListener {
+                binding.manualInput.requestFocus()
+                //open keyboard
+
+
+            }
+
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
                 startCamera()
             } else {
@@ -147,10 +161,13 @@ class MainActivity : AppCompatActivity() {
         binding.scannerOverlay.setTransparentRectangle(scanArea)
     }
 
-    private fun updateVerifyButtonState() {
-        val isTextEntered = binding.manualInput.text.toString().trim().isNotEmpty()
-        val isSizeCorrect = binding.manualInput.text.toString().trim().length == 6
-        binding.scanButton.isEnabled = isTextEntered && binding.manualInput.text.toString().trim().all { it.isDigit() } && isSizeCorrect
+    private fun updateButtonState() {
+        val filled = binding.manualInput.text.toString().trim().isNotEmpty()
+        val size = binding.manualInput.text.toString().trim().length == 6
+        val digits = binding.manualInput.text.toString().trim().all { it.isDigit() }
+
+
+                binding.scanButton.isEnabled = filled && digits && size
     }
 
     private fun startCamera() {
@@ -163,7 +180,9 @@ class MainActivity : AppCompatActivity() {
             }
 
             val imageAnalysis = ImageAnalysis.Builder()
-                .setTargetResolution(Size(binding.viewFinder.width, binding.viewFinder.height))
+                .setResolutionSelector( ResolutionSelector.Builder().setResolutionStrategy(
+                    ResolutionStrategy(Size(binding.viewFinder.width, binding.viewFinder.height), ResolutionStrategy.FALLBACK_RULE_CLOSEST_LOWER))
+                    .build())
                 .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
                 .build()
 
@@ -297,49 +316,33 @@ class MainActivity : AppCompatActivity() {
         }
 
         lifecycleScope.launch {
-            try {
-                // val response = ApiClient.api.verifyCode(cookie, VerifyRequest(code, eventId))
-                val response = VerifyResponse(
-                    success = true,
-                    message = "Código verificado e marcado como resgatado!",
-                    order = Order(
-                        buyer_name = "Kenedy Salvaterra",
-                        tickets = listOf(
-                            Ticket(
-                                ticket_name = "Normal",
-                                quantity = "4"
-                            ),
-                            Ticket(
-                                ticket_name = "VIP",
-                                quantity = "2"
-                            )
-                        )
-                    )
-                )
 
-                val sheet = TicketViewBottomSheet(
-                    success = response.success,
-                    message = response.message ?: "",
-                    order = response.order,
-                    onDismissed = {},
-                )
-                sheet.show(supportFragmentManager, "result")
-                binding.manualInput.text?.clear()
-            } catch (e: Exception) {
-                val sheet = TicketViewBottomSheet(
-                    success = false,
-                    message = getString(R.string.invalid_ticket_or_connection_error),
-                    order = null,
-                    onDismissed = {},
-                )
-                sheet.show(supportFragmentManager, "result")
-                binding.manualInput.text?.clear()
-            }
+            val result = TicketManager.evaluateTicket(cookie, code, eventId)
+            showTicketResult(result)
         }
     }
 
+    private fun showTicketResult(result: TicketResult) {
+        val sheet = when (result) {
+            is TicketResult.Success -> TicketViewBottomSheet(
+                success = true,
+                message = result.message,
+                order = result.order,
+                onDismissed = {},
+            )
+            is TicketResult.Error -> TicketViewBottomSheet(
+                success = false,
+                message = result.message,
+                order = null,
+                onDismissed = {},
+            )
+        }
+        sheet.show(supportFragmentManager, "result")
+       binding.manualInput.text?.clear()
+    }
+
     private fun isValidSession(): Boolean {
-        return currentSessionCookie != null
+        return currentSessionCookie != null && eventId != null
     }
 
     override fun onDestroy() {

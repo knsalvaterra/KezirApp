@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#4D9B9B9B"
     tools:context=".LoginActivity">
 
     <com.google.android.material.card.MaterialCardView
@@ -30,8 +31,11 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Kezir"
+                android:textColor="#212121"
+
                 android:textSize="34sp"
                 android:textStyle="bold"
+                android:maxLines="1"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
@@ -48,6 +52,8 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="32dp"
                 android:hint="Event ID"
+                android:textColor="#49454F"
+                app:hintTextColor="#5F5D66"
                 app:boxCornerRadiusBottomEnd="12dp"
                 app:boxCornerRadiusBottomStart="12dp"
                 app:boxCornerRadiusTopEnd="12dp"
@@ -62,6 +68,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="@drawable/input_bg_rounded"
+                    android:textColor="#49454F"
+                    android:maxLines="1"
                     />
 
             </com.google.android.material.textfield.TextInputLayout>
@@ -73,6 +81,8 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
                 android:hint="PIN"
+                android:textColor="#49454F"
+                app:hintTextColor="#5F5D66"
                 app:boxCornerRadiusBottomEnd="12dp"
                 app:boxCornerRadiusBottomStart="12dp"
                 app:boxCornerRadiusTopEnd="12dp"
@@ -89,6 +99,8 @@
                     android:layout_height="wrap_content"
                     android:inputType="numberPassword"
                     android:background="@drawable/input_bg_rounded"
+                    android:textColor="#282828"
+                    android:maxLines="1"
                     />
 
             </com.google.android.material.textfield.TextInputLayout>

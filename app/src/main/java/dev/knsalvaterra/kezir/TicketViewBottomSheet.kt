@@ -13,6 +13,7 @@ import androidx.core.graphics.toColorInt
 import com.google.android.material.bottomsheet.BottomSheetDragHandleView
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.button.MaterialButton
+import dev.knsalvaterra.kezir.api.Order
 
 class TicketViewBottomSheet(
     private val success: Boolean,
