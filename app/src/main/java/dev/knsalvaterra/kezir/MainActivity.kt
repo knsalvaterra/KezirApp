@@ -318,6 +318,7 @@ class MainActivity : AppCompatActivity() {
         lifecycleScope.launch {
 
             val result = TicketManager.evaluateTicket(cookie, code, eventId)
+
             showTicketResult(result)
         }
     }

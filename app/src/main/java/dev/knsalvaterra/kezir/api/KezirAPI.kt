@@ -136,7 +136,7 @@ interface ApiService {
     suspend fun verifyCode(
         @Header("Cookie") sessionCookie: String,
         @Body request: VerifyRequest
-    ): Response<VerifyResponse>
+    ): VerifyResponse
 }
 
 /**
@@ -186,39 +186,43 @@ object TicketManager {
         }
 
         return try {
-            val response = ApiClient.api.verifyCode(
-                sessionCookie,
-                VerifyRequest(code, eventId)
+           // val response = ApiClient.api.verifyCode(
+           //     sessionCookie,
+           //     VerifyRequest(code, eventId)
+           // )
+
+            val response = VerifyResponse(
+                success = true,
+                message = "CÃ³digo verificado e marcado como resgatado!",
+                order = Order(
+                    buyer_name = "Kenedy Salvaterra",
+                    tickets = listOf(
+                        Ticket(
+                            ticket_name = "Normal",
+                            quantity = "4"
+                        ),
+                        Ticket(
+                            ticket_name = "VIP",
+                            quantity = "2"
+                        )
+                    )
+                )
             )
 
-            // HTTP request itself succeeded
-            if (!response.isSuccessful) {
-                // HTTP error (400, 401, 500, etc.)
-                return TicketResult.Error(
-                    "Server error: ${response.code()} - ${response.message()}"
-                )
-            }
-
-
-            val body = response.body()
-            if (body == null) {
-                return TicketResult.Error("Empty response from server")
-            }
-
-            if (body.success) {
+            if (response.success) {
                 TicketResult.Success(
-                    body.message ?: "Success",
-                    body.order
+                    response.message ?: "Success",
+                    response.order
                 )
             } else {
                 TicketResult.Error(
-                    body.message ?: "Invalid ticket."
+                    response.message ?: "Invalid ticket."
                 )
             }
 
         } catch (e: Exception) {
             Log.e("TicketManager", "Verification request failed", e)
-            TicketResult.Error("Network error: ${e.message}")
+            TicketResult.Error("Verification failed. Check network connection.")
         }
     }
 }
