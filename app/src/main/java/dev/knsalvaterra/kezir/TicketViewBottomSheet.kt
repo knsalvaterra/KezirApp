@@ -1,6 +1,7 @@
 package dev.knsalvaterra.kezir
 
 import android.app.Dialog
+import android.graphics.Typeface
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -16,7 +17,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.card.MaterialCardView
 import dev.knsalvaterra.kezir.api.Order
-
+//pop out anim
 class TicketViewBottomSheet(
     private val success: Boolean,
     private val message: String,
@@ -26,7 +27,7 @@ class TicketViewBottomSheet(
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        isCancelable = false
+        isCancelable = false //no touch outside
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
@@ -34,6 +35,8 @@ class TicketViewBottomSheet(
         dialog.setCanceledOnTouchOutside(false)
         return dialog
     }
+
+
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -43,14 +46,16 @@ class TicketViewBottomSheet(
         return inflater.inflate(R.layout.layout_ticket_sheet, container, false)
     }
 
+
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        setupBottomSheetBehavior()
+        setupSheetBehaviour()
         setupUI(view)
     }
 
-    private fun setupBottomSheetBehavior() {
+    private fun setupSheetBehaviour() {
         (dialog as? BottomSheetDialog)?.findViewById<FrameLayout>(
             com.google.android.material.R.id.design_bottom_sheet
         )?.let { bottomSheet ->
@@ -61,7 +66,11 @@ class TicketViewBottomSheet(
         }
     }
 
+
+
     private fun setupUI(view: View) {
+
+
         val header = view.findViewById<LinearLayout>(R.id.sheetHeaderBar)
         val statusIconCard = view.findViewById<MaterialCardView>(R.id.statusIconCard)
         val statusIcon = view.findViewById<ImageView>(R.id.statusIcon)
@@ -76,8 +85,12 @@ class TicketViewBottomSheet(
         val infoIcon = view.findViewById<ImageView>(R.id.infoIcon)
         val sheetMessage = view.findViewById<TextView>(R.id.sheetMessage)
         val actionButton = view.findViewById<MaterialButton>(R.id.sheetCloseButton)
+        statusSubtitle.visibility = View.GONE
+
 
         if (success && order != null) {
+
+            //todo, combine into a single method
             setupValidState(
                 header,
                 statusIconCard,
@@ -132,53 +145,60 @@ class TicketViewBottomSheet(
         sheetMessage: TextView,
         actionButton: MaterialButton
     ) {
-        // Header styling
+
         header.setBackgroundResource(R.drawable.header_background_valid)
 
-        // Status icon
+        // status icon
         statusIcon.setImageResource(R.drawable.ic_check_circle)
         statusIcon.setColorFilter(
             ContextCompat.getColor(requireContext(), R.color.green_600)
         )
-
-        // Status text
-        statusText.text = "BILHETE VÁLIDO"
+        // status text
+        statusText.text = getString(R.string.status_ticket_valid)
         statusSubtitle.text = "Verificado com sucesso"
 
-        // Buyer info
+
+
+        // client info
         buyerNameLabel.setTextColor( ContextCompat.getColor(requireContext(), R.color.green_600))
         buyerLabelIcon.setColorFilter(
             ContextCompat.getColor(requireContext(), R.color.green_600)
+
         )
         buyerName.text = order?.buyer_name ?: "N/A"
 
-        // Populate ticket details
+        // ticket details
         ticketDetailsContainer.removeAllViews()
         order?.tickets?.forEach { ticket ->
             val detailItem = createTicketDetailItem(ticket.ticket_name, "x${ticket.quantity}")
+            detailItem.layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            )
             ticketDetailsContainer.addView(detailItem)
         }
 
-        // Info message
+        // ifo message
         if (message.isNotBlank()) {
             infoMessageContainer.visibility = View.VISIBLE
             infoMessageContainer.setBackgroundResource(R.drawable.info_message_background_valid)
+
             infoIcon.setColorFilter(
-                ContextCompat.getColor(requireContext(), R.color.green_700)
+                ContextCompat.getColor(requireContext(), R.color.chill_green)
             )
             sheetMessage.text = message
         } else {
             infoMessageContainer.visibility = View.GONE
         }
 
-        // Button
-        actionButton.text = "CONTINUAR"
+
+        actionButton.text = getString(R.string.button_label_continue)
 
         actionButton.setBackgroundColor(
-            ContextCompat.getColor(requireContext(), R.color.green_600)
+            ContextCompat.getColor(requireContext(), R.color.chill_green)
         )
-        actionButton.icon = ContextCompat.getDrawable(requireContext(), R.drawable.ic_arrow_forward)
-        actionButton.iconGravity = MaterialButton.ICON_GRAVITY_END
+      //  actionButton.icon = ContextCompat.getDrawable(requireContext(), R.drawable.ic_arrow_forward)
+      //  actionButton.iconGravity = MaterialButton.ICON_GRAVITY_END
     }
 
     private fun setupInvalidState(
@@ -197,31 +217,32 @@ class TicketViewBottomSheet(
         sheetMessage: TextView,
         actionButton: MaterialButton
     ) {
-        // Header styling
+
+
         header.setBackgroundResource(R.drawable.header_background_invalid)
 
-        // Status icon
+
         statusIcon.setImageResource(R.drawable.ic_error_circle)
         statusIcon.setColorFilter(
             ContextCompat.getColor(requireContext(), R.color.red_600)
         )
 
-        // Status text
-        statusText.text = "BILHETE INVÁLIDO"
+        // status text
+        statusText.text = getString(R.string.status_ticket_invalid)
         statusSubtitle.text = "Não foi possível verificar"
 
-        // Buyer info
+        // client info
         buyerNameLabel.setTextColor( ContextCompat.getColor(requireContext(), R.color.red_600))
         buyerLabelIcon.setColorFilter(
             ContextCompat.getColor(requireContext(), R.color.red_600)
         )
         buyerName.text = "Erro na Validação"
 
-        // Hide ticket details
+        //  ticket details
         ticketsLabel.visibility = View.GONE
         ticketDetailsContainer.visibility = View.GONE
 
-        // Error message
+        // error message
         infoMessageContainer.visibility = View.VISIBLE
         infoMessageContainer.setBackgroundResource(R.drawable.info_message_background_invalid)
         infoIcon.setImageResource(R.drawable.ic_error_circle)
@@ -230,7 +251,7 @@ class TicketViewBottomSheet(
         )
         sheetMessage.text = message
 
-        // Button
+        // button
         actionButton.text = "TENTAR NOVAMENTE"
         actionButton.setBackgroundColor(
             ContextCompat.getColor(requireContext(), R.color.red_600)
@@ -238,6 +259,7 @@ class TicketViewBottomSheet(
         actionButton.icon = null
     }
 
+    //todo, make a layot file instead
     private fun createTicketDetailItem(label: String, value: String): View {
         val context = requireContext()
         return LinearLayout(context).apply {
@@ -245,25 +267,36 @@ class TicketViewBottomSheet(
             layoutParams = LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
+
             ).apply {
                 if (parent is LinearLayout && (parent as LinearLayout).childCount > 0) {
                     topMargin = resources.getDimensionPixelSize(R.dimen.spacing_medium)
                 }
             }
 
-            // Label
+            // ticket name
             addView(TextView(context).apply {
                 text = label
                 setTextAppearance(com.google.android.material.R.style.TextAppearance_Material3_LabelSmall)
                 setTextColor(ContextCompat.getColor(context, R.color.on_surface_variant))
+
+                textSize = 18f
             })
 
-            // Value
+            // ticket amount
             addView(TextView(context).apply {
                 text = value
                 setTextAppearance(com.google.android.material.R.style.TextAppearance_Material3_BodyLarge)
                 setTextColor(ContextCompat.getColor(context, R.color.on_surface))
-                setPadding(0, 4, 0, 0)
+
+                layoutParams = LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.WRAP_CONTENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT)
+                textSize = 16.5f
+
+                typeface = Typeface.DEFAULT_BOLD
+                setPadding(0, 0, 0, 42)
+
             })
         }
     }

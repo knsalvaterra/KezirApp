@@ -14,7 +14,7 @@ class LoginActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityLoginBinding
 
-    private val loginScreen = false
+    private val loginScreen = true
 
 
     //todo remove

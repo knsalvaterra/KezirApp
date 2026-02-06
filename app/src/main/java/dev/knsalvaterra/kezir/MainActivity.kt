@@ -7,6 +7,7 @@ import android.graphics.RectF
 import android.os.Build
 import android.os.Bundle
 import android.os.VibrationEffect
+import android.os.VibrationEffect.DEFAULT_AMPLITUDE
 import android.os.Vibrator
 import android.text.Editable
 import android.text.TextWatcher
@@ -16,6 +17,7 @@ import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.OptIn
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ExperimentalGetImage
@@ -41,6 +43,7 @@ import dev.knsalvaterra.kezir.databinding.ActivityMainBinding
 import kotlinx.coroutines.launch
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
+import kotlin.math.max
 import kotlin.math.min
 
 class MainActivity : AppCompatActivity() {
@@ -53,6 +56,7 @@ class MainActivity : AppCompatActivity() {
     private var lastInvalidCode: String? = null
     private var lastInvalidScanTime: Long = 0
 
+
     private var eventId: String? = null
     private var currentSessionCookie: String? = null
 
@@ -64,10 +68,11 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun vibratePhone(timeMillis: Long = 150) {
+
+    private fun vibratePhone(timeMillis: Long = 150, amplitude: Int = VibrationEffect.DEFAULT_AMPLITUDE) {
         val vibrator = getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            vibrator.vibrate(VibrationEffect.createOneShot(timeMillis, VibrationEffect.DEFAULT_AMPLITUDE))
+            vibrator.vibrate(VibrationEffect.createOneShot(timeMillis, amplitude))
         } else {
             @Suppress("DEPRECATION")
             vibrator.vibrate(timeMillis)
@@ -90,7 +95,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         eventId = intent.getStringExtra("EVENT_ID")
-        currentSessionCookie = intent.getStringExtra("SESSION_COOKIE")
+        currentSessionCookie = intent.getStringExtra("SESSION_COOKIE") //gathered from login activity, mioght change later
 
 
 
@@ -103,6 +108,7 @@ class MainActivity : AppCompatActivity() {
         cameraScannerInit()
 
         binding.manualInput.addTextChangedListener(object : TextWatcher {
+
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
             override fun afterTextChanged(s: Editable?) {
@@ -110,12 +116,14 @@ class MainActivity : AppCompatActivity() {
             }
         })
         binding.manualInput.setOnFocusChangeListener { _, hasFocus ->
+
             if (hasFocus && binding.manualInput.text.toString().trim().isEmpty()) {
               //  binding.manualInput.hint = "Inserir código do Bilhete"
             } else {
               //  binding.manualInput.hint = ""
             }
         }
+
 
         binding.scanButton.setOnClickListener {
             val code = binding.manualInput.text.toString().trim()
@@ -126,15 +134,18 @@ class MainActivity : AppCompatActivity() {
                 }
                 binding.manualInput.text?.clear()
             }
+
         }
         updateButtonState() // initial state
+//unfocus when click outside are
 
         binding.viewFinder.post {
             updateScannerOverlay(binding.scannerOverlay.sizePercentage())
-
+      
             binding.scannerOverlay.setOnClickListener {
-                binding.manualInput.requestFocus()
+             //   binding.manualInput.requestFocus()
                 //open keyboard
+
 
 
             }
@@ -210,8 +221,13 @@ class MainActivity : AppCompatActivity() {
             return
         }
 
+
         try {
+
+
             val mediaImage = imageProxy.image
+
+
             if (mediaImage == null) {
                 imageProxy.close()
                 return
@@ -222,12 +238,18 @@ class MainActivity : AppCompatActivity() {
 
             barcodeScanner.process(image)
                 .addOnSuccessListener { barcodes ->
+
                     var scannedBarcode: Barcode? = null
+
+
                     for (barcode in barcodes) {
                         val boundingBox = barcode.boundingBox
                         if (boundingBox != null) {
+
                             val barcodeRect = boundingBox.toRectF()
-                            if (imageScanArea.intersect(barcodeRect)) {
+                            if (imageScanArea.contains(barcodeRect)) { //intersect only requires paret of the code to be seen while cointains requires the entire code
+
+
                                 scannedBarcode = barcode
                                 break
                             }
@@ -237,6 +259,7 @@ class MainActivity : AppCompatActivity() {
                         handleScannedBarcode(scannedBarcode)
                     }
                 }
+
                 .addOnFailureListener { exception ->
                     Log.e("Scanner", "Barcode scanning failed", exception)
                 }
@@ -263,7 +286,7 @@ class MainActivity : AppCompatActivity() {
         val viewWidth = viewFinder.width.toFloat()
         val viewHeight = viewFinder.height.toFloat()
         
-        val scaleFactor = min(viewWidth / imageWidth, viewHeight / imageHeight)
+        val scaleFactor = max(viewWidth / imageWidth, viewHeight / imageHeight)
         
         val postScaleWidth = imageWidth * scaleFactor
         val postScaleHeight = imageHeight * scaleFactor
@@ -281,9 +304,14 @@ class MainActivity : AppCompatActivity() {
     private fun handleScannedBarcode(barcode: Barcode) {
         val code = barcode.rawValue ?: return
 
-        if (binding.manualInput.text.toString() == code) {
+        if (binding.manualInput.text.toString() == code && lastInvalidCode == code) {
             return
         }
+
+        if (binding.manualInput.text.toString().isNotEmpty() ) {
+            return
+        }
+
 
         if (validCodeFormat(code)) {
             lastInvalidCode = null
@@ -292,8 +320,10 @@ class MainActivity : AppCompatActivity() {
                 vibratePhone()
             }
         } else {
+
+            //non valid
             val now = System.currentTimeMillis()
-            if (lastInvalidCode != code || now - lastInvalidScanTime > 3000) { // 3-second cooldown
+            if (lastInvalidCode != code || now - lastInvalidScanTime > 3000) { // cooldown
                 lastInvalidCode = code
                 lastInvalidScanTime = now
                 runOnUiThread {
@@ -339,7 +369,7 @@ class MainActivity : AppCompatActivity() {
             )
         }
         sheet.show(supportFragmentManager, "result")
-       binding.manualInput.text?.clear()
+      // binding.manualInput.text?.clear()
     }
 
     private fun isValidSession(): Boolean {

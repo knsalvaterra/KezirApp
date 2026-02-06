@@ -1,6 +1,6 @@
 <resources>
     <string name="app_name" translatable="false">Kezir App</string>
-    <string name="unauthenticated">Não autenticado. Não possuis permissoes</string>
+    <string name="unauthenticated">Não autenticado. Não tens permissoes</string>
     <string name="invalid_ticket_or_connection_error">Bilhete inválido ou erro de conexão.</string>
     <string name="invalid_pin">PIN inválido</string>
     <string name="login_error">Erro de login</string>
@@ -11,4 +11,6 @@
     <string name="status_ticket_valid">BILHETE VÁLIDO</string>
     <string name="status_ticket_invalid">BILHETE INVÁLIDO</string>
     <string name="scan_qr_code_label">Scanear Codigo QR</string>
+    <string name="buyer_name_label">Portador do Bilhete</string>
+    <string name="button_label_continue">CONTINUAR</string>
 </resources>
