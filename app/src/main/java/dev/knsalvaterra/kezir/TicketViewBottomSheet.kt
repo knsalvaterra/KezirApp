@@ -1,15 +1,19 @@
 package dev.knsalvaterra.kezir
 
+import android.app.Dialog
 import android.content.res.ColorStateList
 import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.core.graphics.toColorInt
+import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDragHandleView
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.button.MaterialButton
@@ -23,13 +27,14 @@ class TicketViewBottomSheet(
 ) : BottomSheetDialogFragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.layout_ticket_sheet, container, true)
+        return inflater.inflate(R.layout.layout_ticket_sheet, container, false)
     }
 
 
 
     override fun onStart() {
         super.onStart()
+
       //  val bottomSheet = dialog?.findViewById<FrameLayout>(com.google.android.material.R.id.design_bottom_sheet)
       //  if (bottomSheet != null) {
       //      val behavior = BottomSheetBehavior.from(bottomSheet)
@@ -40,6 +45,10 @@ class TicketViewBottomSheet(
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        (dialog as? BottomSheetDialog)?.behavior?.let {
+            it.isHideable = false  // Prevent dismissal by dragging
+            it.state = BottomSheetBehavior.STATE_EXPANDED
+        }
 
         val header = view.findViewById<View>(R.id.sheetHeaderBar)
         val dragHandle = view.findViewById<BottomSheetDragHandleView>(R.id.drag_handle)
@@ -97,6 +106,18 @@ class TicketViewBottomSheet(
 
             dismiss()
         }
+    }
+
+    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+        val dialog = super.onCreateDialog(savedInstanceState)
+        dialog.setCanceledOnTouchOutside(false)
+
+        return dialog
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setCancelable(false);
     }
 
     override fun getTheme(): Int = R.style.CustomBottomSheetDialogTheme

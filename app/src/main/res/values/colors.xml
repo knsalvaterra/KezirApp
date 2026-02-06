@@ -8,4 +8,22 @@
     <color name="black">#FF000000</color>
     <color name="chill_green">#39966B</color>
     <color name="white">#FFFFFFFF</color>
+
+    <!-- Success/Valid colors -->
+    <color name="green_50">#F0FDF4</color>
+    <color name="green_100">#DCFCE7</color>
+    <color name="green_600">#10B981</color>
+    <color name="green_700">#047857</color>
+    <color name="green_800">#065F46</color>
+
+    <!-- Error/Invalid colors -->
+    <color name="red_50">#FEF2F2</color>
+    <color name="red_100">#FEE2E2</color>
+    <color name="red_600">#EF4444</color>
+    <color name="red_700">#B91C1C</color>
+    <color name="red_800">#991B1B</color>
+
+    <!-- Neutral colors -->
+    <color name="on_surface">#1C1B1F</color>
+    <color name="on_surface_variant">#49454F</color>
 </resources>

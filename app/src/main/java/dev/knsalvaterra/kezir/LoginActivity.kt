@@ -26,13 +26,13 @@ class LoginActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         if (loginScreen) {
-            login()
+            setupLoginScreen()
         } else {
-            openMainScreen(test_eventid, "session-cookie") //test todo remove
+            openMainScreen(test_eventid, "session-cookie") //ttodo remove
         }
     }
 
-    private fun login() {
+    private fun setupLoginScreen() {
         binding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
@@ -71,6 +71,7 @@ class LoginActivity : AppCompatActivity() {
 
     private fun handleLoginResult(result: LoginResult) {
         when (result) {
+
             is LoginResult.Success -> {
                 openMainScreen(result.eventId, result.sessionCookie)
             }
