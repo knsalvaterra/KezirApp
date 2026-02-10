@@ -1,16 +1,17 @@
 <resources>
-    <string name="app_name" translatable="false">Kezir App</string>
+    <string name="app_name" translatable="false">Kezir</string>
     <string name="unauthenticated">Não autenticado. Não tens permissoes</string>
     <string name="invalid_ticket_or_connection_error">Bilhete inválido ou erro de conexão.</string>
     <string name="invalid_pin">PIN inválido</string>
     <string name="login_error">Erro de login</string>
-    <string name="camera_permission_denied">Permissão da câmera negada</string>
+    <string name="camera_permission_denied">Permissão da câmera negada. Por favor habilite a permissão.</string>
     <string name="invalid_qr_code">Código QR inválido</string>
-    <string name="insert_hint">Problemas em scanear? Insira manualmente</string>
+    <string name="insert_hint">Problemas em scanear? Insira manualmente.</string>
     <string name="app_toolbar_title">Bilheteiria Kezir</string>
     <string name="status_ticket_valid">BILHETE VÁLIDO</string>
     <string name="status_ticket_invalid">BILHETE INVÁLIDO</string>
-    <string name="scan_qr_code_label">Scanear Codigo QR</string>
+    <string name="scan_qr_code_label">Scanear Código QR</string>
     <string name="buyer_name_label">Portador do Bilhete</string>
+    <string name="buyer_phone_label">Número de Telefone</string>
     <string name="button_label_continue">CONTINUAR</string>
 </resources>

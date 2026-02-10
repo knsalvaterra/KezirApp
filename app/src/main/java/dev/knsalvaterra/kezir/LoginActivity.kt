@@ -18,9 +18,9 @@ class LoginActivity : AppCompatActivity() {
 
 
     //todo remove
-    private val test_eventid = "664544741697781760"
+    private val test_eventid = "675354571144429568"
     //todo remove
-    private val test_pin = "4728"
+    private val test_pin = "7968"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -52,7 +52,7 @@ class LoginActivity : AppCompatActivity() {
                     handleLoginResult(result)
                 }
             } else {
-                Toast.makeText(this, "falta Event ID e PIN", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Preencha os campos Event ID e PIN", Toast.LENGTH_SHORT).show()
             }
         }
     }

@@ -4,10 +4,32 @@
     android:height="108dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
+
+    <!-- Letter 'k' drawn with a consistent stroke for a clean, professional look -->
     <path
-        android:fillColor="#FFFFFF"
-        android:pathData="M54,54m-40,0a40,40 0,1 1,80 0a40,40 0,1 1,-80 0" />
+        android:pathData="M 40,27 L 40,81 M 70,27 L 40,54 L 70,81"
+        android:strokeWidth="12"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:strokeColor="#FFFFFF"/>
+
+    <!-- Orange dot -->
     <path
-        android:fillColor="#000000"
-        android:pathData="M49.5,69.5L34.5,54.5L39.3,49.7L49.5,59.9L68.7,40.7L73.5,45.5L49.5,69.5Z" />
+        android:fillColor="#fba053"
+        android:pathData="M78,30 A5,5 0 1,1 68,30 A5,5 0 1,1 78,30"/>
+
+    <!-- Top green arc -->
+    <path
+        android:pathData="M 30,42 C 30,35.4 35.4,30 42,30"
+        android:strokeColor="#7cc46a"
+        android:strokeWidth="7"
+        android:strokeLineCap="round"/>
+
+    <!-- Bottom green arc -->
+    <path
+        android:pathData="M 78,66 C 78,72.6 72.6,78 66,78"
+        android:strokeColor="#7cc46a"
+        android:strokeWidth="7"
+        android:strokeLineCap="round"/>
+
 </vector>

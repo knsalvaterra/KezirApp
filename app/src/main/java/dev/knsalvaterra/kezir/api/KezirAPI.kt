@@ -47,8 +47,7 @@ data class VerifyRequest(
 
 data class VerifyResponse(
     val success: Boolean,
-
-
+    @SerializedName("message", alternate = ["error"])
     val message: String?,
     val order: Order?
 )
@@ -77,11 +76,14 @@ data class VerifyResponse(
 
 data class Order(
     val buyer_name: String,
+    val buyer_phone: String,
     val tickets: List<Ticket>
 )
 
 data class Ticket(
+    val ticket_type: String,
     val ticket_name: String,
+    val table_capacity: String?,
     val quantity: String
 )
 
@@ -133,28 +135,36 @@ object TicketManager {
         }
 
         return try {
-          val response = ApiClient.api.verifyCode(
-              sessionCookie,
-              VerifyRequest(code, eventId)
-          )
+       val response = ApiClient.api.verifyCode(
+           sessionCookie,
+           VerifyRequest(code, eventId)
+       )
 
-        //    val response = VerifyResponse(
-        //        success = false,
-        //        message = "Código verificado e marcado como resgatado!",
-        //        order = Order(
-        //            buyer_name = "Kenedy Salvaterra",
-        //            tickets = listOf(
-        //                Ticket(
-        //                    ticket_name = "Normal",
-        //                    quantity = "4"
-        //                ),
-        //                Ticket(
-        //                    ticket_name = "VIP",
-        //                    quantity = "2"
-        //                )
-        //            )
-        //        )
-        //    )
+          // val response = VerifyResponse(
+          //     success = true,
+          //     message = "Código verificado e marcado como resgatado!",
+          //     order = Order(
+          //         buyer_name = "Kenedy Salvaterra",
+          //         tickets = listOf(
+          //             Ticket(
+          //                 ticket_name = "Normal",
+          //                 quantity = "4"
+          //             ),
+          //             Ticket(
+          //                 ticket_name = "Normal",
+          //                 quantity = "2"
+          //             ),
+          //             Ticket(
+          //                 ticket_name = "VIP",
+          //             quantity = "2"
+          //         ),
+          //             Ticket(
+          //                 ticket_name = "VIP",
+          //                 quantity = "2"
+          //             )
+          //         )
+          //     )
+          // )
 
             if (response.success) {
                 TicketResult.Success(

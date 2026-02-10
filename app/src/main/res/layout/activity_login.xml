@@ -52,8 +52,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="32dp"
                 android:hint="Event ID"
-                android:textColor="#49454F"
-                app:hintTextColor="#5F5D66"
+                android:textColorHint="#5F5D66"
                 app:boxCornerRadiusBottomEnd="12dp"
                 app:boxCornerRadiusBottomStart="12dp"
                 app:boxCornerRadiusTopEnd="12dp"
@@ -67,8 +66,10 @@
                     android:id="@+id/eventIdEditText"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+
                     android:background="@drawable/input_bg_rounded"
-                    android:textColor="#49454F"
+                    android:textColor="#282828"
+                    app:hintTextColor="#5F5D66"
                     android:maxLines="1"
                     />
 
@@ -83,6 +84,7 @@
                 android:hint="PIN"
                 android:textColor="#49454F"
                 app:hintTextColor="#5F5D66"
+                android:textColorHint="#5F5D66"
                 app:boxCornerRadiusBottomEnd="12dp"
                 app:boxCornerRadiusBottomStart="12dp"
                 app:boxCornerRadiusTopEnd="12dp"

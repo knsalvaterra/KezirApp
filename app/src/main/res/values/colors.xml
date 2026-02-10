@@ -26,4 +26,9 @@
     <!-- Neutral colors -->
     <color name="on_surface">#1C1B1F</color>
     <color name="on_surface_variant">#49454F</color>
+
+    <!-- Icon colors -->
+    <color name="ic_launcher_background">#3B875C</color> <!-- The dark green -->
+    <color name="accent_light_green">#80C565</color>    <!-- The arcs -->
+    <color name="accent_orange">#F38C44</color>         <!-- The dot -->
 </resources>

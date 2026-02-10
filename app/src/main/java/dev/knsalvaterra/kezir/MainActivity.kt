@@ -7,7 +7,6 @@ import android.graphics.RectF
 import android.os.Build
 import android.os.Bundle
 import android.os.VibrationEffect
-import android.os.VibrationEffect.DEFAULT_AMPLITUDE
 import android.os.Vibrator
 import android.text.Editable
 import android.text.TextWatcher
@@ -17,14 +16,13 @@ import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.OptIn
-import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
+import androidx.camera.core.Camera
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ExperimentalGetImage
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageProxy
 import androidx.camera.core.Preview
-import androidx.camera.core.impl.utils.ResolutionSelectorUtil
 import androidx.camera.core.resolutionselector.ResolutionSelector
 import androidx.camera.core.resolutionselector.ResolutionStrategy
 import androidx.camera.lifecycle.ProcessCameraProvider
@@ -52,13 +50,20 @@ class MainActivity : AppCompatActivity() {
     private lateinit var cameraExecutor: ExecutorService
     private lateinit var barcodeScanner: BarcodeScanner
     private lateinit var cameraProvider: ProcessCameraProvider
+    private var camera: Camera? = null
     private lateinit var scanArea: RectF
     private var lastInvalidCode: String? = null
     private var lastInvalidScanTime: Long = 0
-
+    private var isFlashOn = false
 
     private var eventId: String? = null
     private var currentSessionCookie: String? = null
+    private var shouldScan: Boolean = false;
+
+    companion object {
+        private val VIBRATION_SUCCESS_PATTERN = longArrayOf(0, 150)
+        private val VIBRATION_FAILURE_PATTERN = longArrayOf(0, 75, 100, 75)
+    }
 
     private val cameraPermissionLauncher: ActivityResultLauncher<String> = registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
         if (isGranted) {
@@ -69,13 +74,13 @@ class MainActivity : AppCompatActivity() {
     }
 
 
-    private fun vibratePhone(timeMillis: Long = 150, amplitude: Int = VibrationEffect.DEFAULT_AMPLITUDE) {
+    private fun vibrate(pattern: LongArray) {
         val vibrator = getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            vibrator.vibrate(VibrationEffect.createOneShot(timeMillis, amplitude))
+            vibrator.vibrate(VibrationEffect.createWaveform(pattern, -1))
         } else {
             @Suppress("DEPRECATION")
-            vibrator.vibrate(timeMillis)
+            vibrator.vibrate(pattern, -1)
         }
     }
 
@@ -127,15 +132,24 @@ class MainActivity : AppCompatActivity() {
 
         binding.scanButton.setOnClickListener {
             val code = binding.manualInput.text.toString().trim()
-            if (code.isNotEmpty() && validCodeFormat(code)) {
+            if (code.isEmpty()) {
+                shouldScan = true
+
+            } else if (validCodeFormat(code)) {
                 verifyCode(code)
                 runOnUiThread {
-                    vibratePhone()
+
+                    vibrate(VIBRATION_SUCCESS_PATTERN)
                 }
                 binding.manualInput.text?.clear()
             }
-
         }
+
+        binding.flashToggleButton.setOnClickListener {
+            isFlashOn = !isFlashOn
+            updateFlashState()
+        }
+
         updateButtonState() // initial state
 //unfocus when click outside are
 
@@ -173,12 +187,14 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun updateButtonState() {
-        val filled = binding.manualInput.text.toString().trim().isNotEmpty()
-        val size = binding.manualInput.text.toString().trim().length == 6
-        val digits = binding.manualInput.text.toString().trim().all { it.isDigit() }
-
-
-                binding.scanButton.isEnabled = filled && digits && size
+        val code = binding.manualInput.text.toString().trim()
+        if (code.isEmpty()) {
+            binding.scanButton.text = "Scanear"
+            binding.scanButton.isEnabled = true
+        } else {
+            binding.scanButton.text = "Verificar"
+            binding.scanButton.isEnabled = validCodeFormat(code)
+        }
     }
 
     private fun startCamera() {
@@ -201,19 +217,29 @@ class MainActivity : AppCompatActivity() {
 
             try {
                 cameraProvider.unbindAll()
-                cameraProvider.bindToLifecycle(this, CameraSelector.DEFAULT_BACK_CAMERA, preview, imageAnalysis)
+                camera = cameraProvider.bindToLifecycle(this, CameraSelector.DEFAULT_BACK_CAMERA, preview, imageAnalysis)
+                updateFlashState()
             } catch (exc: Exception) {
                 Log.e("Scanner", "Camera binding failed", exc)
             }
         }, ContextCompat.getMainExecutor(this))
     }
 
+    private fun updateFlashState() {
+        val flashIcon = if (isFlashOn) R.drawable.ic_flash_on else R.drawable.ic_flash_off
+        binding.flashToggleButton.setImageResource(flashIcon)
+
+        camera?.cameraControl?.enableTorch(isFlashOn)
+    }
+
     @OptIn(ExperimentalGetImage::class)
     private fun processImageProxy(imageProxy: ImageProxy) {
-        if (!::scanArea.isInitialized || imageProxy.image == null) {
+        if (!shouldScan || !::scanArea.isInitialized || imageProxy.image == null) {
             imageProxy.close()
             return
         }
+
+        shouldScan = false // per click migght add a delay too
 
         val imageScanArea = getTransformedScanArea(imageProxy)
         if (imageScanArea.isEmpty) {
@@ -247,7 +273,7 @@ class MainActivity : AppCompatActivity() {
                         if (boundingBox != null) {
 
                             val barcodeRect = boundingBox.toRectF()
-                            if (imageScanArea.contains(barcodeRect)) { //intersect only requires paret of the code to be seen while cointains requires the entire code
+                            if (imageScanArea.intersect(barcodeRect)) { //intersect only requires paret of the code to be seen while cointains requires the entire code
 
 
                                 scannedBarcode = barcode
@@ -257,10 +283,16 @@ class MainActivity : AppCompatActivity() {
                     }
                     if (scannedBarcode != null) {
                         handleScannedBarcode(scannedBarcode)
+                    } else {
+                        runOnUiThread {
+                            vibrate(VIBRATION_FAILURE_PATTERN)
+                            Toast.makeText(this, "Código QR não encontrado", Toast.LENGTH_SHORT).show()
+                        }
                     }
                 }
 
                 .addOnFailureListener { exception ->
+
                     Log.e("Scanner", "Barcode scanning failed", exception)
                 }
                 .addOnCompleteListener {
@@ -317,7 +349,7 @@ class MainActivity : AppCompatActivity() {
             lastInvalidCode = null
             runOnUiThread {
                 binding.manualInput.setText(code)
-                vibratePhone()
+                vibrate(VIBRATION_SUCCESS_PATTERN)
             }
         } else {
 
@@ -328,7 +360,7 @@ class MainActivity : AppCompatActivity() {
                 lastInvalidScanTime = now
                 runOnUiThread {
                     Toast.makeText(this, getString(R.string.invalid_qr_code), Toast.LENGTH_SHORT).show()
-                    vibratePhone(75)
+                    vibrate(VIBRATION_FAILURE_PATTERN)
                 }
             }
         }
@@ -373,7 +405,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun isValidSession(): Boolean {
-        return currentSessionCookie != null && eventId != null
+        return currentSessionCookie != null || eventId != null
     }
 
     override fun onDestroy() {
