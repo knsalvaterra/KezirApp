@@ -119,10 +119,13 @@
                 app:backgroundTint="@color/button_tint_selector"
                 android:textColor="#FFFFFF"
                 app:cornerRadius="16dp"
+
                 android:textSize="18sp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/pinInputLayout" />
+
+
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

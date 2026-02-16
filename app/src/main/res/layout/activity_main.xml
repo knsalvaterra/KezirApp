@@ -19,15 +19,18 @@
         android:id="@+id/scanner_overlay"
         android:layout_width="0dp"
         android:layout_height="0dp"
+
+        android:layout_marginBottom="120dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.5"
         app:overlay_borderColor="#FFFFFF"
         app:overlay_borderWidth="8dp"
+        app:overlay_cornerLengthRatio="0.1"
         app:overlay_cornerRadius="16dp"
-        app:overlay_sizePercentage="0.65"
-        app:overlay_cornerLengthRatio="0.1" />
+        app:overlay_sizePercentage="0.55" />
 
     <!-- dark tint when theres no camera permissions -->
     <View
@@ -47,11 +50,11 @@
         android:text="@string/scan_qr_code_label"
 
         android:textSize="16sp"
-        android:layout_marginTop="182dp"
+        app:layout_constraintBottom_toBottomOf="@+id/scanner_overlay"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/scanner_overlay"
-        app:layout_constraintVertical_bias="0.2" />
+        app:layout_constraintVertical_bias="0.25" />
 
     <!-- app top, back button todo-->
     <!--     app:navigationIcon="?attr/homeAsUpIndicator"
@@ -79,7 +82,7 @@
         app:layout_constraintBottom_toTopOf="@id/bottomPanel"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        android:layout_marginBottom="16dp" />
+        android:layout_marginBottom="18dp" />
 
     <!-- entry box(bottm) -->
     <com.google.android.material.card.MaterialCardView
@@ -87,7 +90,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="16dp"
-        android:layout_marginBottom="24dp"
+        android:layout_marginBottom="48dp"
         app:cardBackgroundColor="#F2FFFFFF"
         app:cardCornerRadius="24dp"
         app:cardElevation="8dp"
@@ -100,7 +103,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="24dp">
+            android:padding="24dp"
+            >
 
             <TextView
                 android:layout_width="wrap_content"

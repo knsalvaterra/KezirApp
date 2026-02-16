@@ -1,17 +1,23 @@
 package dev.knsalvaterra.kezir.api
 
 import android.util.Log
+import dev.knsalvaterra.kezir.R
 
 sealed class LoginResult { //
     data class Success(val eventId: String, val sessionCookie: String) : LoginResult()
 
 
-    data class Error(val message: String) : LoginResult()
+    data class Error(val message: Int) : LoginResult()
 
 
 }
 
 object AuthManager {
+    // muckup login with this cookie m836v1d0grchu3mgu5v2e3ne91
+    suspend fun login(sessionCookie: String): LoginResult {
+        return LoginResult.Success("664544741697781760", sessionCookie)
+        }
+
     suspend fun login(pin: String, eventId: String): LoginResult {
         return try {
             val request = PinRequest(pin, eventId)
@@ -24,16 +30,16 @@ object AuthManager {
                 if (sessionCookie != null) {
                     LoginResult.Success(eventId, sessionCookie)
                 } else {
-                    LoginResult.Error("Session cookie not found in response.")
+                    LoginResult.Error(R.string.session_cookie_not_found)
                 }
 
 
             } else {
-                LoginResult.Error("Invalid PIN or Event ID.")
+                LoginResult.Error(R.string.invalid_pin_or_event_id)
             }
         } catch (e: Exception) {
             Log.e("AuthManager", "Login request failed", e)
-            LoginResult.Error("Falha no login. Verifique a ligação à internet.")
+            LoginResult.Error(R.string.login_failed_check_connection)
         }
     }
 }

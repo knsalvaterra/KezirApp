@@ -1,8 +1,15 @@
 package dev.knsalvaterra.kezir.api
 
 import android.annotation.SuppressLint
+import android.content.Context
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
 import android.util.Log
 import com.google.gson.annotations.SerializedName
+import dev.knsalvaterra.kezir.data.AppDatabase
+import dev.knsalvaterra.kezir.data.StoredTicket
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -121,9 +128,49 @@ object ApiClient {
 
 object TicketManager {
 
+    private fun isNetworkAvailable(context: Context): Boolean {
+        val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val network = connectivityManager.activeNetwork ?: return false
+        val activeNetwork = connectivityManager.getNetworkCapabilities(network) ?: return false
+
+        return when {
+            activeNetwork.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) -> true
+            activeNetwork.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) -> true
+            else -> false
+        }
+    }
+
+    private suspend fun verifyTicketOffline(context: Context, code: String): TicketResult {
+        val ticketDao = AppDatabase.getDatabase(context).ticketDao()
+        val tkt = withContext(Dispatchers.IO) {
+            ticketDao.getTicketByCode(code)
+        }
+
+        return if (tkt != null) {
+            val mockOrder = Order(
+                buyer_name = tkt.buyerName,
+                buyer_phone = tkt.buyerPhone,
+                tickets = listOf(
+                    Ticket(
+                        ticket_type = tkt.ticketType,
+                        ticket_name = tkt.ticketName,
+                        table_capacity = tkt.tableCapacity,
+                        quantity = tkt.quantity
+                    )
+                )
+            )
+            TicketResult.Success(
+                "Código verificado!",
+                mockOrder
+            )
+        } else {
+            TicketResult.Error("Código de bilhete offline inválido")
+        }
+    }
 
     @SuppressLint("SuspiciousIndentation")
     suspend fun evaluateTicket(
+        context: Context,
         sessionCookie: String,
         code: String,
         eventId: String?
@@ -134,39 +181,32 @@ object TicketManager {
             return TicketResult.Error("Event ID is missing.")
         }
 
+     //   if (!isNetworkAvailable(context)) {
+     //       return verifyTicketOffline(context, code)
+     //   }
+//
         return try {
-       val response = ApiClient.api.verifyCode(
-           sessionCookie,
-           VerifyRequest(code, eventId)
-       )
+            val response = ApiClient.api.verifyCode(
+                sessionCookie,
+                VerifyRequest(code, eventId)
+            )
 
-          // val response = VerifyResponse(
-          //     success = true,
-          //     message = "Código verificado e marcado como resgatado!",
-          //     order = Order(
-          //         buyer_name = "Kenedy Salvaterra",
-          //         tickets = listOf(
-          //             Ticket(
-          //                 ticket_name = "Normal",
-          //                 quantity = "4"
-          //             ),
-          //             Ticket(
-          //                 ticket_name = "Normal",
-          //                 quantity = "2"
-          //             ),
-          //             Ticket(
-          //                 ticket_name = "VIP",
-          //             quantity = "2"
-          //         ),
-          //             Ticket(
-          //                 ticket_name = "VIP",
-          //                 quantity = "2"
-          //             )
-          //         )
-          //     )
-          // )
+            if (response.success && response.order != null) {
+                val ticketDao = AppDatabase.getDatabase(context).ticketDao()
+                val storedTicket = StoredTicket(
+                    code = code,
+                    buyerName = response.order.buyer_name,
+                    buyerPhone = response.order.buyer_phone,
+                    ticketType = response.order.tickets.first().ticket_type,
+                    ticketName = response.order.tickets.first().ticket_name,
+                    tableCapacity = response.order.tickets.first().table_capacity,
+                    quantity = response.order.tickets.first().quantity,
+                    eventId = eventId
+                )
+                withContext(Dispatchers.IO) {
+                    ticketDao.insertTicket(storedTicket)
+                }
 
-            if (response.success) {
                 TicketResult.Success(
                     response.message ?: "Success",
                     response.order
@@ -179,7 +219,6 @@ object TicketManager {
 
         } catch (e: Exception) {
             Log.e("TicketManager", "Verification request failed", e)
-         //   TicketResult.Error("Verification failed. Check network connection")
             TicketResult.Error("Código de bilhete não encontrado ou já foi utilizado.")
 
         }

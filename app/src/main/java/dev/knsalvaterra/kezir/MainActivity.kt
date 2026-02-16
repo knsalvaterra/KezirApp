@@ -36,8 +36,8 @@ import com.google.mlkit.vision.barcode.common.Barcode
 import com.google.mlkit.vision.common.InputImage
 import dev.knsalvaterra.kezir.api.TicketManager
 import dev.knsalvaterra.kezir.api.TicketResult
-
 import dev.knsalvaterra.kezir.databinding.ActivityMainBinding
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
@@ -47,8 +47,14 @@ import kotlin.math.min
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
-    private lateinit var cameraExecutor: ExecutorService
-    private lateinit var barcodeScanner: BarcodeScanner
+    private val cameraExecutor: ExecutorService by lazy { Executors.newSingleThreadExecutor() }
+    private val barcodeScanner: BarcodeScanner by lazy {
+        BarcodeScanning.getClient(
+            BarcodeScannerOptions.Builder()
+                .setBarcodeFormats(Barcode.FORMAT_QR_CODE)
+                .build()
+        )
+    }
     private lateinit var cameraProvider: ProcessCameraProvider
     private var camera: Camera? = null
     private lateinit var scanArea: RectF
@@ -58,7 +64,10 @@ class MainActivity : AppCompatActivity() {
 
     private var eventId: String? = null
     private var currentSessionCookie: String? = null
-    private var shouldScan: Boolean = false;
+    private var shouldScan: Boolean = false
+    private var isScanning: Boolean = false
+    private val scanDuration = 1000L
+
 
     companion object {
         private val VIBRATION_SUCCESS_PATTERN = longArrayOf(0, 150)
@@ -69,7 +78,7 @@ class MainActivity : AppCompatActivity() {
         if (isGranted) {
             startCamera()
         } else {
-            Toast.makeText(this, getString(R.string.camera_permission_denied), Toast.LENGTH_LONG).show()
+            Toast.makeText(this, getString(R.string.camera_permission_denied), Toast.LENGTH_LONG).show() //maybe make this mandatory
         }
     }
 
@@ -84,15 +93,15 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun cameraScannerInit() {
-        cameraExecutor = Executors.newSingleThreadExecutor()
-
-        barcodeScanner = BarcodeScanning.getClient(
-            BarcodeScannerOptions.Builder()
-                .setBarcodeFormats(Barcode.FORMAT_QR_CODE)
-                .build()
-        )
-    }
+   // private fun cameraScannerInit() {
+   //     cameraExecutor = Executors.newSingleThreadExecutor()
+//
+   //     barcodeScanner = BarcodeScanning.getClient(
+   //         BarcodeScannerOptions.Builder()
+   //             .setBarcodeFormats(Barcode.FORMAT_QR_CODE)
+   //             .build()
+   //     )
+   // }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -105,12 +114,12 @@ class MainActivity : AppCompatActivity() {
 
 
         if (!isValidSession()) {
-            Toast.makeText(this, "Sessão Invalida. Tente novamente", Toast.LENGTH_LONG).show()
+            Toast.makeText(this, getString(R.string.session_invalid), Toast.LENGTH_LONG).show()
             finish()
             return
         }
 
-        cameraScannerInit()
+       // cameraScannerInit()
 
         binding.manualInput.addTextChangedListener(object : TextWatcher {
 
@@ -133,8 +142,18 @@ class MainActivity : AppCompatActivity() {
         binding.scanButton.setOnClickListener {
             val code = binding.manualInput.text.toString().trim()
             if (code.isEmpty()) {
-                shouldScan = true
-
+                if (!isScanning) {
+                    lifecycleScope.launch {
+                        isScanning = true
+                        updateButtonState()
+                        delay(scanDuration)
+                        shouldScan = true
+                        isScanning = false
+                        if (binding.manualInput.text.toString().trim().isEmpty()) {
+                            updateButtonState()
+                        }
+                    }
+                }
             } else if (validCodeFormat(code)) {
                 verifyCode(code)
                 runOnUiThread {
@@ -185,14 +204,20 @@ class MainActivity : AppCompatActivity() {
         scanArea = RectF(left, top, right, bottom)
         binding.scannerOverlay.setTransparentRectangle(scanArea)
     }
-
+//todo move every hardcoded string to @android/strings resource
     private fun updateButtonState() {
+        if (isScanning) {
+            binding.scanButton.text = getString(R.string.button_scanning)
+            binding.scanButton.isEnabled = false
+            return
+        }
+
         val code = binding.manualInput.text.toString().trim()
         if (code.isEmpty()) {
-            binding.scanButton.text = "Scanear"
+            binding.scanButton.text = getString(R.string.button_scan)
             binding.scanButton.isEnabled = true
         } else {
-            binding.scanButton.text = "Verificar"
+            binding.scanButton.text = getString(R.string.button_verify)
             binding.scanButton.isEnabled = validCodeFormat(code)
         }
     }
@@ -273,7 +298,7 @@ class MainActivity : AppCompatActivity() {
                         if (boundingBox != null) {
 
                             val barcodeRect = boundingBox.toRectF()
-                            if (imageScanArea.intersect(barcodeRect)) { //intersect only requires paret of the code to be seen while cointains requires the entire code
+                            if (imageScanArea.intersect(barcodeRect)) { //intersect only requires part of the code to be seen while cointains requires the entire code to be in frame
 
 
                                 scannedBarcode = barcode
@@ -286,7 +311,7 @@ class MainActivity : AppCompatActivity() {
                     } else {
                         runOnUiThread {
                             vibrate(VIBRATION_FAILURE_PATTERN)
-                            Toast.makeText(this, "Código QR não encontrado", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(this, getString(R.string.qr_code_not_found), Toast.LENGTH_SHORT).show()
                         }
                     }
                 }
@@ -379,7 +404,7 @@ class MainActivity : AppCompatActivity() {
 
         lifecycleScope.launch {
 
-            val result = TicketManager.evaluateTicket(cookie, code, eventId)
+            val result = TicketManager.evaluateTicket(this@MainActivity, cookie, code, eventId)
 
             showTicketResult(result)
         }
@@ -405,7 +430,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun isValidSession(): Boolean {
-        return currentSessionCookie != null || eventId != null
+        return currentSessionCookie != null && eventId != null
     }
 
     override fun onDestroy() {

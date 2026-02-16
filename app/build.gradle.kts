@@ -1,5 +1,6 @@
 plugins {
     alias(libs.plugins.android.application)
+    alias(libs.plugins.ksp)
 }
 
 android {
@@ -43,9 +44,9 @@ android {
 
 dependencies {
     // Core Android & UI
-    implementation("androidx.core:core-ktx:1.12.0")
-    implementation("androidx.appcompat:appcompat:1.6.1")
-    implementation("com.google.android.material:material:1.11.0")
+    implementation("androidx.core:core-ktx:1.17.0")
+    implementation("androidx.appcompat:appcompat:1.7.1")
+    implementation("com.google.android.material:material:1.13.0")
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
 
     // CameraX (Modern Camera API)
@@ -55,7 +56,7 @@ dependencies {
     implementation("androidx.camera:camera-view:${camerax_version}")
 
     // Google ML Kit (High-speed QR Scanning)
-    implementation("com.google.mlkit:barcode-scanning:17.2.0")
+    implementation("com.google.mlkit:barcode-scanning:17.3.0")
 
     // Network (Retrofit)
     implementation("com.squareup.retrofit2:retrofit:3.0.0")
@@ -63,6 +64,11 @@ dependencies {
 
     // Lifecycle
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.7.0")
+
+    // Room
+    implementation("androidx.room:room-runtime:2.6.1")
+    implementation("androidx.room:room-ktx:2.6.1")
+
 
     // Testing
     testImplementation("junit:junit:4.13.2")

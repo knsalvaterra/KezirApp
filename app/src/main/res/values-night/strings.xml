@@ -3,5 +3,6 @@
     <string name="app_toolbar_title">Bilheteiria Kezir</string>
     <string name="status_ticket_valid">BILHETE VÁLIDO</string>
     <string name="status_ticket_invalid">BILHETE INVÁLIDO</string>
-    <string name="buyer_phone_label">Telefone do Comprador</string>
+    <string name="buyer_phone_label">Número de Telefone</string>
+    <string name="button_scan">Scanear</string>
 </resources>

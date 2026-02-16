@@ -14,4 +14,14 @@
     <string name="buyer_name_label">Portador do Bilhete</string>
     <string name="buyer_phone_label">Número de Telefone</string>
     <string name="button_label_continue">CONTINUAR</string>
+    <string name="session_cookie_not_found">Session cookie not found in response.</string>
+    <string name="invalid_pin_or_event_id">Invalid PIN or Event ID.</string>
+    <string name="auth_manager_log_tag">AuthManager</string>
+    <string name="login_request_failed">Login request failed</string>
+    <string name="login_failed_check_connection">Falha no login. Verifique a ligação à internet.</string>
+    <string name="button_scanning">Scaneando...</string>
+    <string name="session_invalid">Sessão Inválida. Tente novamente</string>
+    <string name="qr_code_not_found">Código QR não encontrado</string>
+    <string name="button_scan">Scanear</string>
+    <string name="button_verify">Verificar</string>
 </resources>
