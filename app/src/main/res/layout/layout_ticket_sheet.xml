@@ -34,6 +34,7 @@
                 android:layout_width="36dp"
                 android:layout_height="36dp"
                 android:layout_gravity="center"
+                android:contentDescription="TODO"
                 android:src="@drawable/ic_check_circle"
                 app:tint="@color/green_600" />
 
@@ -46,11 +47,12 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
             android:letterSpacing="0.05"
-            android:text="BILHETE VÁLIDO"
+            android:text="@string/status_ticket_valid"
+            android:textAllCaps="true"
             android:textAppearance="?attr/textAppearanceHeadlineSmall"
             android:textColor="?attr/colorOnPrimary"
             android:textStyle="bold"
-            tools:text="BILHETE VÁLIDO" />
+            tools:text="@string/status_ticket_valid" />
 
         <!-- Subtitle -->
         <TextView
@@ -59,10 +61,10 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
             android:alpha="0.9"
-            android:text="Verificado com sucesso"
+            android:text="@string/status_subtitle_success"
             android:textAppearance="?attr/textAppearanceBodyMedium"
             android:textColor="?attr/colorOnPrimary"
-            tools:text="Verificado com sucesso" />
+            tools:text="@string/status_subtitle_success" />
 
     </LinearLayout>
 
@@ -96,7 +98,7 @@
                     android:orientation="vertical"
                     android:padding="20dp">
 
-                    <!-- Name Label with icon -->
+
                     <LinearLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -116,9 +118,9 @@
                             android:layout_height="wrap_content"
                             android:layout_marginStart="8dp"
                             android:letterSpacing="0.1"
-                            android:text="@string/buyer_name_label"
+                            android:text="@string/label_buyer_name"
                             android:textAppearance="?attr/textAppearanceLabelMedium"
-                            android:textColor="?attr/colorPrimary"
+                            android:textColor="#6750A4"
                             android:textAllCaps="true" />
 
                     </LinearLayout>
@@ -155,7 +157,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginStart="8dp"
                             android:letterSpacing="0.1"
-                            android:text="@string/buyer_phone_label"
+                            android:text="@string/label_buyer_phone"
                             android:textAppearance="?attr/textAppearanceLabelMedium"
                             android:textColor="?attr/colorPrimary"
                             android:textAllCaps="true" />
@@ -185,7 +187,8 @@
                 android:layout_marginTop="32dp"
                 android:layout_marginBottom="12dp"
                 android:letterSpacing="0.1"
-                android:text="DETALHES DO BILHETE"
+                android:text="@string/label_ticket_details"
+                android:textAllCaps="true"
                 android:textAppearance="?attr/textAppearanceTitleSmall"
                 android:textColor="?attr/colorOnSurfaceVariant"
                 android:textStyle="bold" />
@@ -246,7 +249,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="1"
-                android:minHeight="24dp" />
+                android:minHeight="12dp" />
 
 
         </LinearLayout>
@@ -261,10 +264,9 @@
         android:paddingVertical="16dp"
         android:layout_gravity="bottom"
         android:layout_margin="24dp"
-        android:text="CONTINUAR"
+        android:text="@string/button_label_continue"
         android:textAppearance="?attr/textAppearanceLabelLarge"
         android:textColor="?attr/colorOnPrimary"
-        android:textStyle="bold"
         android:textSize="16sp"
         app:backgroundTint="@color/button_tint_selector"
         app:cornerRadius="16dp" />

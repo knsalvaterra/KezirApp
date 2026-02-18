@@ -31,7 +31,7 @@ class LoginActivity : AppCompatActivity() {
         binding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        binding.titleTextView.setOnLongClickListener {
+        binding.titleTextView.setOnLongClickListener { //DEBUG
             binding.eventIdEditText.setText(test_eventid)
             binding.pinEditText.setText(test_pin)
             true

@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="unauthenticated">Unauthenticated. You do not have permission.</string>
+    <string name="invalid_ticket_or_connection_error">Invalid ticket or connection error.</string>
+    <string name="invalid_pin">Invalid PIN</string>
+    <string name="login_error">Login error</string>
+    <string name="camera_permission_denied">Camera permission denied. Please enable the permission.</string>
+    <string name="invalid_qr_code">Invalid QR code.</string>
+    <string name="insert_hint">Having trouble scanning? Enter manually.</string>
+    <string name="app_toolbar_title">Kezir Box Office</string>
+    <string name="status_ticket_valid">Valid Ticket</string>
+    <string name="status_ticket_invalid">Invalid Ticket</string>
+    <string name="scan_qr_code_label">Scan QR Code</string>
+    <string name="label_buyer_name">Ticket Holder</string>
+    <string name="label_buyer_phone">Phone Number</string>
+    <string name="button_label_continue">CONTINUE</string>
+    <string name="session_cookie_not_found">Session cookie not found in response.</string>
+    <string name="invalid_pin_or_event_id">Invalid PIN or event ID.</string>
+    <string name="auth_manager_log_tag">AuthManager</string>
+    <string name="login_request_failed">Login request failed</string>
+    <string name="login_failed_check_connection">Login failed. Please check your internet connection.</string>
+    <string name="session_invalid">Invalid session. Please try again.</string>
+    <string name="qr_code_not_found">QR code not found.</string>
+    <string name="label_button_scan">Scan</string>
+    <string name="label_button_verify">Verify</string>
+    <string name="label_button_scanning">Scanning…</string>
+    <string name="insert_ticket_code">Enter ticket code</string>
+    <string name="status_subtitle_success">Successfully verified</string>
+    <string name="status_subtitle_failure">Could not verify</string>
+    <string name="label_ticket_details">Ticket details</string>
+    <string name="label_button_login">Login</string>
+    <string name="label_pin">PIN</string>
+    <string name="label_eventid">Event ID</string>
+</resources>

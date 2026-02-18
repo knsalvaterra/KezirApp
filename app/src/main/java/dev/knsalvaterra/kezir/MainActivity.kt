@@ -66,7 +66,7 @@ class MainActivity : AppCompatActivity() {
     private var currentSessionCookie: String? = null
     private var shouldScan: Boolean = false
     private var isScanning: Boolean = false
-    private val scanDuration = 1000L
+    private val scanDuration = 850L
 
 
     companion object {
@@ -160,7 +160,6 @@ class MainActivity : AppCompatActivity() {
 
                     vibrate(VIBRATION_SUCCESS_PATTERN)
                 }
-                binding.manualInput.text?.clear()
             }
         }
 
@@ -197,7 +196,7 @@ class MainActivity : AppCompatActivity() {
 
         val rectSize = min(width, height) * sizePercentage
         val left = (width - rectSize) / 2
-        val top = (height - rectSize) / 2
+        val top = (height - rectSize) * sizePercentage // /2
         val right = left + rectSize
         val bottom = top + rectSize
 
@@ -207,17 +206,17 @@ class MainActivity : AppCompatActivity() {
 //todo move every hardcoded string to @android/strings resource
     private fun updateButtonState() {
         if (isScanning) {
-            binding.scanButton.text = getString(R.string.button_scanning)
+            binding.scanButton.text = getString(R.string.label_button_scanning)
             binding.scanButton.isEnabled = false
             return
         }
 
         val code = binding.manualInput.text.toString().trim()
         if (code.isEmpty()) {
-            binding.scanButton.text = getString(R.string.button_scan)
+            binding.scanButton.text = getString(R.string.label_button_scan)
             binding.scanButton.isEnabled = true
         } else {
-            binding.scanButton.text = getString(R.string.button_verify)
+            binding.scanButton.text = getString(R.string.label_button_verify)
             binding.scanButton.isEnabled = validCodeFormat(code)
         }
     }
@@ -377,7 +376,7 @@ class MainActivity : AppCompatActivity() {
                 vibrate(VIBRATION_SUCCESS_PATTERN)
             }
             verifyCode(code)
-            Toast.makeText(this, "Código de bilhete: $code", Toast.LENGTH_LONG).show()
+            Toast.makeText(this, "Código do bilhete: $code", Toast.LENGTH_SHORT).show()
         } else {
 
             //non valid
@@ -394,11 +393,12 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun validCodeFormat(code: String): Boolean {
-        return code.length == 6 && code.all { it.isDigit() }
+        //code.length == 6
+        return code.isNotEmpty() && code.all { it.isDigit() }
     }
 
     private fun verifyCode(code: String) {
-        binding.manualInput.text?.clear()
+
         val cookie = currentSessionCookie ?: run {
             Toast.makeText(this, getString(R.string.unauthenticated), Toast.LENGTH_LONG).show()
             return
@@ -410,6 +410,7 @@ class MainActivity : AppCompatActivity() {
 
             showTicketResult(result)
         }
+        binding.manualInput.text?.clear()
     }
 
     private fun showTicketResult(result: TicketResult) {

@@ -40,7 +40,7 @@ class TicketViewBottomSheet(
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.layout_ticket_sheet, container, false)
+        return inflater.inflate(R.layout.layout_ticket_sheet, container, true)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -166,7 +166,7 @@ class TicketViewBottomSheet(
         statusIcon.setColorFilter(ContextCompat.getColor(requireContext(), R.color.green_600))
 
         statusText.text = getString(R.string.status_ticket_valid)
-        statusSubtitle.text = "Verificado com sucesso"
+        statusSubtitle.text = getString(R.string.status_subtitle_success)
 
         buyerNameLabel.visibility = View.VISIBLE
         buyerLabelIcon.visibility = View.VISIBLE
@@ -237,7 +237,7 @@ class TicketViewBottomSheet(
         statusIcon.setColorFilter(ContextCompat.getColor(requireContext(), R.color.red_600))
 
         statusText.text = getString(R.string.status_ticket_invalid)
-        statusSubtitle.text = "Não foi possível verificar"
+        statusSubtitle.text = getString(R.string.status_subtitle_failure)
 
      //   buyerNameLabel.visibility = View.GONE
      //   buyerLabelIcon.visibility = View.GONE

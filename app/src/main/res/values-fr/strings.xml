@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+
+    <string name="unauthenticated">Non authentifié. Vous n\'avez pas les autorisations nécessaires.</string>
+    <string name="invalid_ticket_or_connection_error">Billet invalide ou erreur de connexion.</string>
+    <string name="invalid_pin">PIN invalide</string>
+    <string name="login_error">Erreur de connexion</string>
+    <string name="camera_permission_denied">Permission de la caméra refusée. Veuillez activer la permission.</string>
+    <string name="invalid_qr_code">Code QR invalide.</string>
+    <string name="insert_hint">Problème de scan ? Saisissez manuellement.</string>
+    <string name="app_toolbar_title">Billetterie Kezir</string>
+    <string name="status_ticket_valid">Billet Valide</string>
+    <string name="status_ticket_invalid">Billet Invalide</string>
+    <string name="scan_qr_code_label">Scanner le code QR</string>
+    <string name="label_buyer_name">Titulaire du billet</string>
+    <string name="label_buyer_phone">Numéro de téléphone</string>
+    <string name="button_label_continue">CONTINUER</string>
+    <string name="session_cookie_not_found">Cookie de session introuvable dans la réponse.</string>
+    <string name="invalid_pin_or_event_id">PIN ou identifiant d\'événement invalide.</string>
+    <string name="auth_manager_log_tag">AuthManager</string>
+    <string name="login_request_failed">Échec de la demande de connexion</string>
+    <string name="login_failed_check_connection">Échec de la connexion. Veuillez vérifier votre connexion internet.</string>
+    <string name="session_invalid">Session invalide. Veuillez réessayer.</string>
+    <string name="qr_code_not_found">Code QR introuvable.</string>
+    <string name="label_button_scan">Scanner</string>
+    <string name="label_button_verify">Vérifier</string>
+    <string name="label_button_scanning">Scan en cours…</string>
+    <string name="insert_ticket_code">Saisir le code du billet</string>
+    <string name="status_subtitle_success">Vérifié avec succès</string>
+    <string name="status_subtitle_failure">Impossible de vérifier</string>
+    <string name="label_ticket_details">Détails du billet</string>
+    <string name="label_button_login">Se connecter</string>
+    <string name="label_pin">PIN</string>
+    <string name="label_eventid">Event ID</string>
+</resources>
