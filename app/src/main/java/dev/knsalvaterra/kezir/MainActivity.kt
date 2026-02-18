@@ -376,6 +376,8 @@ class MainActivity : AppCompatActivity() {
                 binding.manualInput.setText(code)
                 vibrate(VIBRATION_SUCCESS_PATTERN)
             }
+            verifyCode(code)
+            Toast.makeText(this, "Código de bilhete: $code", Toast.LENGTH_LONG).show()
         } else {
 
             //non valid

@@ -136,6 +136,7 @@ object TicketManager {
         return when {
             activeNetwork.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) -> true
             activeNetwork.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) -> true
+            activeNetwork.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) -> true
             else -> false
         }
     }
@@ -160,7 +161,7 @@ object TicketManager {
                 )
             )
             TicketResult.Success(
-                "Código verificado!",
+                "Código verificado offline!",
                 mockOrder
             )
         } else {
@@ -175,52 +176,44 @@ object TicketManager {
         code: String,
         eventId: String?
     ): TicketResult {
-
-
         if (eventId == null) {
             return TicketResult.Error("Event ID is missing.")
         }
 
-     //   if (!isNetworkAvailable(context)) {
-     //       return verifyTicketOffline(context, code)
-     //   }
-//
+
         return try {
             val response = ApiClient.api.verifyCode(
                 sessionCookie,
                 VerifyRequest(code, eventId)
             )
 
-            if (response.success && response.order != null) {
-                val ticketDao = AppDatabase.getDatabase(context).ticketDao()
-                val storedTicket = StoredTicket(
-                    code = code,
-                    buyerName = response.order.buyer_name,
-                    buyerPhone = response.order.buyer_phone,
-                    ticketType = response.order.tickets.first().ticket_type,
-                    ticketName = response.order.tickets.first().ticket_name,
-                    tableCapacity = response.order.tickets.first().table_capacity,
-                    quantity = response.order.tickets.first().quantity,
-                    eventId = eventId
-                )
-                withContext(Dispatchers.IO) {
-                    ticketDao.insertTicket(storedTicket)
-                }
+            if (response.success) {
+            //    val ticketDao = AppDatabase.getDatabase(context).ticketDao()
+            //    val storedTicket = StoredTicket(
+            //        code = code,
+            //        buyerName = response.order.buyer_name,
+            //        buyerPhone = response.order.buyer_phone,
+            //        ticketType = response.order.tickets.first().ticket_type,
+            //        ticketName = response.order.tickets.first().ticket_name,
+            //        tableCapacity = response.order.tickets.first().table_capacity,
+            //        quantity = response.order.tickets.first().quantity,
+            //        eventId = eventId
+            //    )
+            //    withContext(Dispatchers.IO) {
+            //        ticketDao.insertTicket(storedTicket)
+            //    }
 
-                TicketResult.Success(
+                return TicketResult.Success(
                     response.message ?: "Success",
                     response.order
                 )
             } else {
-                TicketResult.Error(
-                    response.message ?: "Invalid ticket."
-                )
+                return TicketResult.Error(response.message ?: "Invalid ticket.")
             }
-
         } catch (e: Exception) {
             Log.e("TicketManager", "Verification request failed", e)
+            //   TicketResult.Error("Verification failed. Check network connection")
             TicketResult.Error("Código de bilhete não encontrado ou já foi utilizado.")
-
-        }
     }
+        }
 }

@@ -39,8 +39,8 @@ class LoginActivity : AppCompatActivity() {
 
         binding.loginButton.setOnClickListener {
             if (isNetworkAvailable()) {
-                val eventId = binding.eventIdEditText.text.toString().trim()
-                val pin = binding.pinEditText.text.toString().trim()
+                val eventId = binding.eventIdEditText.text.toString()
+                val pin = binding.pinEditText.text.toString()
 
                 if (eventId.isNotBlank() && pin.isNotBlank()) {
                     lifecycleScope.launch {

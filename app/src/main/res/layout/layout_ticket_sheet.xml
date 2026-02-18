@@ -8,7 +8,7 @@
     android:orientation="vertical"
     android:paddingTop="24dp">
 
-    <!-- Status header with gradient background -->
+    <!-- stat8us -->
     <LinearLayout
         android:id="@+id/sheetHeaderBar"
         android:layout_width="match_parent"

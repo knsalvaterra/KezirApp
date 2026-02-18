@@ -3,9 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/main_gradient">  <!--  not necessary for now since its only a camera-->
+    android:background="@drawable/main_gradient">
 
-    <!-- camera preview (camera will overlap) -->
     <androidx.camera.view.PreviewView
         android:id="@+id/viewFinder"
         android:layout_width="0dp"
@@ -19,20 +18,17 @@
         android:id="@+id/scanner_overlay"
         android:layout_width="0dp"
         android:layout_height="0dp"
-
-        android:layout_marginBottom="120dp"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/flash_toggle_button"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.5"
+        app:layout_constraintVertical_bias="0.4"
         app:overlay_borderColor="#FFFFFF"
         app:overlay_borderWidth="8dp"
         app:overlay_cornerLengthRatio="0.1"
         app:overlay_cornerRadius="16dp"
         app:overlay_sizePercentage="0.55" />
 
-    <!-- dark tint when theres no camera permissions -->
     <View
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -42,24 +38,17 @@
         android:id="@+id/qrCodeLabel"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-
         android:background="@drawable/label_background"
         android:paddingHorizontal="16dp"
-        android:paddingVertical="8dp"
-
+        android:paddingVertical="12dp"
         android:text="@string/scan_qr_code_label"
-
         android:textSize="16sp"
-        app:layout_constraintBottom_toBottomOf="@+id/scanner_overlay"
+        app:layout_constraintBottom_toBottomOf="@id/scanner_overlay"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/scanner_overlay"
-        app:layout_constraintVertical_bias="0.25" />
+        app:layout_constraintTop_toTopOf="@id/scanner_overlay"
+        app:layout_constraintVertical_bias="0.5" />
 
-    <!-- app top, back button todo-->
-    <!--     app:navigationIcon="?attr/homeAsUpIndicator"
-        app:navigationIconTint="#FFFFFF"
-        -->
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
@@ -71,26 +60,23 @@
         app:titleTextAppearance="@style/TextAppearance.Material3.TitleLarge"
         app:titleTextColor="#FFFFFF"/>
 
-
     <ImageButton
         android:id="@+id/flash_toggle_button"
         android:layout_width="48dp"
         android:layout_height="48dp"
+        android:layout_marginBottom="18dp"
         android:background="@drawable/label_background"
-
         android:src="@drawable/ic_flash_on"
         app:layout_constraintBottom_toTopOf="@id/bottomPanel"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        android:layout_marginBottom="18dp" />
+        app:layout_constraintStart_toStartOf="parent" />
 
-    <!-- entry box(bottm) -->
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/bottomPanel"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="16dp"
-        android:layout_marginBottom="48dp"
+        android:layout_marginBottom="16dp"
         app:cardBackgroundColor="#F2FFFFFF"
         app:cardCornerRadius="24dp"
         app:cardElevation="8dp"
@@ -135,8 +121,6 @@
                     android:inputType="number"
                     android:maxLines="1" />
             </com.google.android.material.textfield.TextInputLayout>
-
-
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/scanButton"
