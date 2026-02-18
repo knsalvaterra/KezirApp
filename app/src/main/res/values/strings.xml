@@ -31,4 +31,11 @@
     <string name="label_button_login">Login</string>
     <string name="label_pin">PIN</string>
     <string name="label_eventid">Event ID</string>
+    <string name="ticket_code_is">"Código do bilhete: "</string>
+    <string name="camera_permission_title">Permissão da câmara necessária</string>
+    <string name="camera_permission_message">Esta aplicação precisa de acesso à câmara para ler códigos QR. Por favor, concede a permissão nas definições da aplicação.</string>
+    <string name="camera_permission_settings">Definições</string>
+    <string name="camera_permission_cancel">Cancelar</string>
+    <string name="manual_input_hint">Inserir código do Bilhete</string>
+    <string name="try_again_button">Tentar Novamente</string>
 </resources>

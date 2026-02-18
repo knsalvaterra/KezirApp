@@ -1,3 +1,5 @@
+import com.android.build.api.dsl.Packaging
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.ksp)
@@ -21,7 +23,8 @@ android {
 
     buildTypes {
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
+            isShrinkResources = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -35,7 +38,7 @@ android {
     buildFeatures {
         viewBinding = true
     }
-    packagingOptions {
+    fun Packaging.() {
         jniLibs {
             useLegacyPackaging = true
         }
@@ -55,7 +58,7 @@ dependencies {
     implementation("androidx.camera:camera-lifecycle:${camerax_version}")
     implementation("androidx.camera:camera-view:${camerax_version}")
 
-    // Google ML Kit (High-speed QR Scanning)
+    // Google ML Kit (QR Scanning)
     implementation("com.google.mlkit:barcode-scanning:17.3.0")
 
     // Network (Retrofit)
@@ -74,6 +77,4 @@ dependencies {
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
-
-    implementation("androidx.appcompat:appcompat:1.6.1")
 }

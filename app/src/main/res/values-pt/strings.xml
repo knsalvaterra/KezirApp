@@ -11,7 +11,7 @@
     <string name="status_ticket_valid">Bilhete Válido</string>
     <string name="status_ticket_invalid">Bilhete Inválido</string>
     <string name="scan_qr_code_label">Ler Código QR</string>
-    <string name="label_buyer_name">Titular do Bilhete</string>
+    <string name="label_buyer_name">Portador do Bilhete</string>
     <string name="label_buyer_phone">Número de Telefone</string>
     <string name="button_label_continue">CONTINUAR</string>
     <string name="session_cookie_not_found">Session cookie not found in response.</string>
@@ -31,4 +31,11 @@
     <string name="label_button_login">Iniciar sessão</string>
     <string name="label_pin">PIN de accesso</string>
     <string name="label_eventid">ID do evento</string>
+    <string name="ticket_code_is">Código do bilhete:</string>
+    <string name="camera_permission_title">Permissão da câmara necessária</string>
+    <string name="camera_permission_message">Esta aplicação precisa de acesso à câmara para ler códigos QR. Por favor, concede a permissão nas definições da aplicação.</string>
+    <string name="camera_permission_settings">Definições</string>
+    <string name="camera_permission_cancel">Cancelar</string>
+    <string name="manual_input_hint">Inserir código do Bilhete</string>
+    <string name="try_again_button">TENTAR NOVAMENTE</string>
 </resources>

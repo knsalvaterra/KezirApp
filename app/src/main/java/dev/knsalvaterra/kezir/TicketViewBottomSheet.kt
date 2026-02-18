@@ -18,9 +18,9 @@ import com.google.android.material.card.MaterialCardView
 import dev.knsalvaterra.kezir.api.Order
 
 class TicketViewBottomSheet(
-    private val success: Boolean,
-    private val message: String,
-    private val order: Order?,
+    private var success: Boolean? = null,
+    private var message: String? = null,
+    private var order: Order? = null,
     private val onDismissed: () -> Unit = {}
 ) : BottomSheetDialogFragment() {
 
@@ -61,6 +61,13 @@ class TicketViewBottomSheet(
         }
     }
 
+    fun updateWithResult(success: Boolean, message: String, order: Order?) {
+        this.success = success
+        this.message = message
+        this.order = order
+        view?.let { setupUI(it) }
+    }
+
     private fun setupUI(view: View) {
         val header = view.findViewById<LinearLayout>(R.id.sheetHeaderBar)
         val statusIconCard = view.findViewById<MaterialCardView>(R.id.statusIconCard)
@@ -79,48 +86,11 @@ class TicketViewBottomSheet(
         val infoIcon = view.findViewById<ImageView>(R.id.infoIcon)
         val sheetMessage = view.findViewById<TextView>(R.id.sheetMessage)
         val actionButton = view.findViewById<MaterialButton>(R.id.sheetCloseButton)
-        statusSubtitle.visibility = View.GONE
 
-        if (success && order != null) {
-            setupValidState(
-                header,
-                statusIconCard,
-                statusIcon,
-                statusText,
-                statusSubtitle,
-                buyerLabelIcon,
-                buyerName,
-                buyerNameLabel,
-                buyerPhoneIcon,
-                buyerPhone,
-                buyerPhoneLabel,
-                ticketsLabel,
-                ticketDetailsContainer,
-                infoMessageContainer,
-                infoIcon,
-                sheetMessage,
-                actionButton
-            )
-        } else {
-            setupInvalidState(
-                header,
-                statusIconCard,
-                statusIcon,
-                statusText,
-                statusSubtitle,
-                buyerLabelIcon,
-                buyerName,
-                buyerNameLabel,
-                buyerPhoneIcon,
-                buyerPhone,
-                buyerPhoneLabel,
-                ticketsLabel,
-                ticketDetailsContainer,
-                infoMessageContainer,
-                infoIcon,
-                sheetMessage,
-                actionButton
-            )
+        when (success) {
+            null -> setupLoadingState(header, statusIcon, statusText, statusSubtitle, buyerName, buyerPhone, ticketsLabel, ticketDetailsContainer, infoMessageContainer, actionButton)
+            true -> setupValidState(header, statusIconCard, statusIcon, statusText, statusSubtitle, buyerLabelIcon, buyerName, buyerNameLabel, buyerPhoneIcon, buyerPhone, buyerPhoneLabel, ticketsLabel, ticketDetailsContainer, infoMessageContainer, infoIcon, sheetMessage, actionButton)
+            false -> setupInvalidState(header, statusIconCard, statusIcon, statusText, statusSubtitle, buyerLabelIcon, buyerName, buyerNameLabel, buyerPhoneIcon, buyerPhone, buyerPhoneLabel, ticketsLabel, ticketDetailsContainer, infoMessageContainer, infoIcon, sheetMessage, actionButton)
         }
 
         actionButton.setOnClickListener {
@@ -139,6 +109,34 @@ class TicketViewBottomSheet(
             if (it.isDigit()) '*' else it
         }.joinToString("")
         return censoredPart + lastFourDigits
+    }
+
+    private fun setupLoadingState(
+        header: View,
+        statusIcon: ImageView,
+        statusText: TextView,
+        statusSubtitle: TextView,
+        buyerName: TextView, 
+        buyerPhone: TextView,
+        ticketsLabel: TextView,
+        ticketDetailsContainer: ViewGroup,
+        infoMessageContainer: View,
+        actionButton: MaterialButton
+    ) {
+        header.setBackgroundResource(R.drawable.header_background_invalid) 
+
+        statusIcon.setImageResource(R.drawable.ic_info) 
+        statusText.text = "A verificar..."
+        statusSubtitle.text = "Aguarde um momento"
+
+        buyerName.text = ""
+        buyerPhone.text = ""
+        ticketsLabel.visibility = View.GONE
+        ticketDetailsContainer.visibility = View.GONE
+        infoMessageContainer.visibility = View.GONE
+
+        actionButton.text = getString(R.string.camera_permission_cancel)
+        actionButton.isEnabled = true
     }
 
     private fun setupValidState(
@@ -255,9 +253,9 @@ class TicketViewBottomSheet(
         infoMessageContainer.setBackgroundResource(R.drawable.info_message_background_invalid)
         infoIcon.setImageResource(R.drawable.ic_error_circle)
         infoIcon.setColorFilter(ContextCompat.getColor(requireContext(), R.color.red_600))
-        sheetMessage.text = message
+        message?.let { sheetMessage.text = it }
 
-        actionButton.text = "TENTAR NOVAMENTE"
+        actionButton.text = getString(R.string.try_again_button)
         actionButton.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.red_600))
         actionButton.icon = null
     }

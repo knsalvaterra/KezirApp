@@ -33,4 +33,11 @@
     <string name="label_button_login">Se connecter</string>
     <string name="label_pin">PIN</string>
     <string name="label_eventid">Event ID</string>
+    <string name="ticket_code_is">Code du billet:</string>
+    <string name="camera_permission_title">Permission de la caméra requise</string>
+    <string name="camera_permission_message">Cette application a besoin de l\'accès à la caméra pour scanner les codes QR. Veuillez accorder la permission dans les paramètres de l\'application.</string>
+    <string name="camera_permission_settings">Paramètres</string>
+    <string name="camera_permission_cancel">Annuler</string>
+    <string name="manual_input_hint">Saisir le code du billet</string>
+    <string name="try_again_button">Réessayer</string>
 </resources>

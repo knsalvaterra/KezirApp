@@ -2,12 +2,15 @@ package dev.knsalvaterra.kezir
 
 import android.Manifest
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.RectF
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.VibrationEffect
 import android.os.Vibrator
+import android.provider.Settings
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
@@ -16,6 +19,7 @@ import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.OptIn
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.camera.core.Camera
 import androidx.camera.core.CameraSelector
@@ -78,8 +82,25 @@ class MainActivity : AppCompatActivity() {
         if (isGranted) {
             startCamera()
         } else {
-            Toast.makeText(this, getString(R.string.camera_permission_denied), Toast.LENGTH_LONG).show() //maybe make this mandatory
+            showPermissionDeniedDialog()
         }
+    }
+
+    private fun showPermissionDeniedDialog() {
+        AlertDialog.Builder(this)
+            .setTitle(getString(R.string.camera_permission_title))
+            .setMessage(getString(R.string.camera_permission_message))
+            .setPositiveButton(getString(R.string.camera_permission_settings)) { _, _ ->
+                val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+                val uri = Uri.fromParts("package", packageName, null)
+                intent.data = uri
+                startActivity(intent)
+            }
+            .setNegativeButton(getString(R.string.camera_permission_cancel)) { dialog, _ ->
+                dialog.dismiss()
+                Toast.makeText(this, getString(R.string.camera_permission_denied), Toast.LENGTH_LONG).show()
+            }
+            .show()
     }
 
 
@@ -376,7 +397,7 @@ class MainActivity : AppCompatActivity() {
                 vibrate(VIBRATION_SUCCESS_PATTERN)
             }
             verifyCode(code)
-            Toast.makeText(this, "Código do bilhete: $code", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, getString(R.string.ticket_code_is) + code, Toast.LENGTH_SHORT).show()
         } else {
 
             //non valid
