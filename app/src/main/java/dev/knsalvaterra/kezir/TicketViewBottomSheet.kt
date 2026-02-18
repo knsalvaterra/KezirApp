@@ -88,9 +88,9 @@ class TicketViewBottomSheet(
         val actionButton = view.findViewById<MaterialButton>(R.id.sheetCloseButton)
 
         when (success) {
-            null -> setupLoadingState(header, statusIcon, statusText, statusSubtitle, buyerName, buyerPhone, ticketsLabel, ticketDetailsContainer, infoMessageContainer, actionButton)
             true -> setupValidState(header, statusIconCard, statusIcon, statusText, statusSubtitle, buyerLabelIcon, buyerName, buyerNameLabel, buyerPhoneIcon, buyerPhone, buyerPhoneLabel, ticketsLabel, ticketDetailsContainer, infoMessageContainer, infoIcon, sheetMessage, actionButton)
             false -> setupInvalidState(header, statusIconCard, statusIcon, statusText, statusSubtitle, buyerLabelIcon, buyerName, buyerNameLabel, buyerPhoneIcon, buyerPhone, buyerPhoneLabel, ticketsLabel, ticketDetailsContainer, infoMessageContainer, infoIcon, sheetMessage, actionButton)
+            null -> {}
         }
 
         actionButton.setOnClickListener {
@@ -109,34 +109,6 @@ class TicketViewBottomSheet(
             if (it.isDigit()) '*' else it
         }.joinToString("")
         return censoredPart + lastFourDigits
-    }
-
-    private fun setupLoadingState(
-        header: View,
-        statusIcon: ImageView,
-        statusText: TextView,
-        statusSubtitle: TextView,
-        buyerName: TextView, 
-        buyerPhone: TextView,
-        ticketsLabel: TextView,
-        ticketDetailsContainer: ViewGroup,
-        infoMessageContainer: View,
-        actionButton: MaterialButton
-    ) {
-        header.setBackgroundResource(R.drawable.header_background_invalid) 
-
-        statusIcon.setImageResource(R.drawable.ic_info) 
-        statusText.text = "A verificar..."
-        statusSubtitle.text = "Aguarde um momento"
-
-        buyerName.text = ""
-        buyerPhone.text = ""
-        ticketsLabel.visibility = View.GONE
-        ticketDetailsContainer.visibility = View.GONE
-        infoMessageContainer.visibility = View.GONE
-
-        actionButton.text = getString(R.string.camera_permission_cancel)
-        actionButton.isEnabled = true
     }
 
     private fun setupValidState(
@@ -197,7 +169,7 @@ class TicketViewBottomSheet(
             ticketDetailsContainer.addView(detailItem)
         }
 
-        if (message.isNotBlank()) {
+        if (message?.isNotBlank() == true) {
             infoMessageContainer.visibility = View.VISIBLE
             infoMessageContainer.setBackgroundResource(R.drawable.info_message_background_valid)
 
@@ -240,6 +212,8 @@ class TicketViewBottomSheet(
      //   buyerNameLabel.visibility = View.GONE
      //   buyerLabelIcon.visibility = View.GONE
      //   buyerName.visibility = View.GONE
+        statusSubtitle.visibility = View.GONE
+
         buyerName.text = "N/A"
 
         buyerPhoneLabel.visibility = View.GONE

@@ -61,15 +61,24 @@ class MainActivity : AppCompatActivity() {
     }
     private lateinit var cameraProvider: ProcessCameraProvider
     private var camera: Camera? = null
+    
+    
+    
     private lateinit var scanArea: RectF
     private var lastInvalidCode: String? = null
     private var lastInvalidScanTime: Long = 0
+    
+    
     private var isFlashOn = false
 
     private var eventId: String? = null
     private var currentSessionCookie: String? = null
     private var shouldScan: Boolean = false
+    
+    
     private var isScanning: Boolean = false
+    
+    
     private val scanDuration = 850L
 
 
@@ -397,7 +406,7 @@ class MainActivity : AppCompatActivity() {
                 vibrate(VIBRATION_SUCCESS_PATTERN)
             }
             verifyCode(code)
-            Toast.makeText(this, getString(R.string.ticket_code_is) + code, Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, getString(R.string.ticket_code_is) + " " + code, Toast.LENGTH_SHORT).show()
         } else {
 
             //non valid
@@ -419,38 +428,37 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun verifyCode(code: String) {
-
         val cookie = currentSessionCookie ?: run {
             Toast.makeText(this, getString(R.string.unauthenticated), Toast.LENGTH_LONG).show()
             return
         }
 
         lifecycleScope.launch {
-
             val result = TicketManager.evaluateTicket(this@MainActivity, cookie, code, eventId)
-
             showTicketResult(result)
         }
-        binding.manualInput.text?.clear()
     }
 
     private fun showTicketResult(result: TicketResult) {
+        val onDismissed = {
+            binding.manualInput.text?.clear()
+            updateButtonState()
+        }
         val sheet = when (result) {
             is TicketResult.Success -> TicketViewBottomSheet(
                 success = true,
                 message = result.message,
                 order = result.order,
-                onDismissed = {},
+                onDismissed = onDismissed,
             )
             is TicketResult.Error -> TicketViewBottomSheet(
                 success = false,
                 message = result.message,
                 order = null,
-                onDismissed = {},
+                onDismissed = onDismissed,
             )
         }
         sheet.show(supportFragmentManager, "result")
-      // binding.manualInput.text?.clear()
     }
 
     private fun isValidSession(): Boolean {
