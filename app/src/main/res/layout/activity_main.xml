@@ -27,7 +27,7 @@
         app:overlay_cornerLengthRatio="0.1"
         app:overlay_cornerRadius="16dp"
         app:overlay_sizePercentage="0.55"
-        app:overlay_verticalBias="0.55" />
+        app:overlay_verticalBias="0.45" />
 
     <View
         android:layout_width="match_parent"
@@ -62,9 +62,9 @@
 
     <ImageButton
         android:id="@+id/flash_toggle_button"
-        android:layout_width="42dp"
-        android:layout_height="42dp"
-        android:layout_marginBottom="4dp"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_marginBottom="16dp"
         android:background="@drawable/label_background"
         android:src="@drawable/ic_flash_on"
         app:layout_constraintBottom_toTopOf="@id/bottomPanel"

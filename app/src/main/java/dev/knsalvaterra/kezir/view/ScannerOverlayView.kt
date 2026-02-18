@@ -75,6 +75,10 @@ class ScannerOverlayView @JvmOverloads constructor(
         return sizePercentage
     }
 
+    fun verticalBias(): Float {
+        return verticalBias;
+    }
+
     fun setTransparentRectangle(rect: RectF) {
         isRectManuallySet = true
         transparentRect.set(rect)

@@ -172,7 +172,7 @@ class MainActivity : AppCompatActivity() {
 //unfocus when click outside are
 
         binding.viewFinder.post {
-            updateScannerOverlay(binding.scannerOverlay.sizePercentage())
+            updateScannerOverlay(binding.scannerOverlay.sizePercentage(), binding.scannerOverlay.verticalBias())
       
             binding.scannerOverlay.setOnClickListener {
              //   binding.manualInput.requestFocus()
@@ -190,13 +190,13 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun updateScannerOverlay(sizePercentage: Float) {
+    private fun updateScannerOverlay(sizePercentage: Float, verticalBias: Float = 0.5f) {
         val width = binding.viewFinder.width.toFloat()
         val height = binding.viewFinder.height.toFloat()
 
         val rectSize = min(width, height) * sizePercentage
         val left = (width - rectSize) / 2
-        val top = (height - rectSize) * sizePercentage // /2
+        val top = (height - rectSize)  * verticalBias
         val right = left + rectSize
         val bottom = top + rectSize
 
