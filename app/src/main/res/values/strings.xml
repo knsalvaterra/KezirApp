@@ -11,7 +11,7 @@
     <string name="status_ticket_valid">Bilhete Válido</string>
     <string name="status_ticket_invalid">Bilhete Inválido</string>
     <string name="scan_qr_code_label">Ler Código QR</string>
-    <string name="label_buyer_name">Titular do Bilhete</string>
+    <string name="label_buyer_name">Portador do Bilhete</string>
     <string name="label_buyer_phone">Número de Telefone</string>
     <string name="button_label_continue">CONTINUAR</string>
     <string name="session_cookie_not_found">Session cookie not found in response.</string>

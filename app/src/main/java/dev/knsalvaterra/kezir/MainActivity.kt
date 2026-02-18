@@ -159,14 +159,14 @@ class MainActivity : AppCompatActivity() {
                 updateButtonState()
             }
         })
-        binding.manualInput.setOnFocusChangeListener { _, hasFocus ->
-
-            if (hasFocus && binding.manualInput.text.toString().trim().isEmpty()) {
-              //  binding.manualInput.hint = "Inserir código do Bilhete"
-            } else {
-              //  binding.manualInput.hint = ""
-            }
-        }
+     //   binding.manualInput.setOnFocusChangeListener { _, hasFocus ->
+//
+     //       if (hasFocus && binding.manualInput.text.toString().trim().isEmpty()) {
+     //         //  binding.manualInput.hint = "Inserir código do Bilhete"
+     //       } else {
+     //         //  binding.manualInput.hint = ""
+     //       }
+     //   }
 
 
         binding.scanButton.setOnClickListener {

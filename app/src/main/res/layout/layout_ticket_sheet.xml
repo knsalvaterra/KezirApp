@@ -6,7 +6,7 @@
     android:layout_height="wrap_content"
     android:background="@drawable/bottom_sheet_background"
     android:orientation="vertical"
-    android:paddingTop="24dp">
+    android:paddingTop="20dp">
 
     <!-- stat8us -->
     <LinearLayout
@@ -110,7 +110,7 @@
                             android:layout_width="16dp"
                             android:layout_height="16dp"
                             android:src="@drawable/ic_person"
-                            app:tint="?attr/colorPrimary" />
+                            app:tint="?attr/colorOnSurfaceVariant" />
 
                         <TextView
                             android:id="@+id/buyerNameLabel"
@@ -120,7 +120,7 @@
                             android:letterSpacing="0.1"
                             android:text="@string/label_buyer_name"
                             android:textAppearance="?attr/textAppearanceLabelMedium"
-                            android:textColor="#6750A4"
+                            android:textColor="?attr/colorOnSurfaceVariant"
                             android:textAllCaps="true" />
 
                     </LinearLayout>
@@ -149,7 +149,7 @@
                             android:layout_width="16dp"
                             android:layout_height="16dp"
                             android:src="@drawable/ic_phone"
-                            app:tint="?attr/colorPrimary" />
+                            app:tint="?attr/colorOnSurfaceVariant" />
 
                         <TextView
                             android:id="@+id/buyerPhoneLabel"
@@ -159,7 +159,7 @@
                             android:letterSpacing="0.1"
                             android:text="@string/label_buyer_phone"
                             android:textAppearance="?attr/textAppearanceLabelMedium"
-                            android:textColor="?attr/colorPrimary"
+                            android:textColor="?attr/colorOnSurfaceVariant"
                             android:textAllCaps="true" />
 
                     </LinearLayout>
@@ -216,7 +216,7 @@
                 android:id="@+id/infoMessageContainer"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
+                android:layout_marginTop="28dp"
                 android:background="@drawable/info_message_background_valid"
                 android:gravity="center_vertical"
                 android:orientation="horizontal"
@@ -268,6 +268,7 @@
         android:textAppearance="?attr/textAppearanceLabelLarge"
         android:textColor="?attr/colorOnPrimary"
         android:textSize="16sp"
+        android:textAllCaps="true"
         app:backgroundTint="@color/button_tint_selector"
         app:cornerRadius="16dp" />
 </LinearLayout>
