@@ -7,7 +7,7 @@
     <string name="camera_permission_denied">Permissão da câmera negada. Por favor habilite a permissão.</string>
     <string name="invalid_qr_code">Código QR inválido</string>
     <string name="insert_hint">Problemas em scanear? Insira manualmente.</string>
-    <string name="app_toolbar_title">Bilheteiria Kezir</string>
+    <string name="app_toolbar_title">Bilheteria Kezir</string>
     <string name="status_ticket_valid">BILHETE VÁLIDO</string>
     <string name="status_ticket_invalid">BILHETE INVÁLIDO</string>
     <string name="scan_qr_code_label">Scanear Código QR</string>
@@ -24,4 +24,5 @@
     <string name="qr_code_not_found">Código QR não encontrado</string>
     <string name="button_scan">Scanear</string>
     <string name="button_verify">Verificar</string>
+    <string name="insert_ticket_code">Inserir código do Bilhete</string>
 </resources>

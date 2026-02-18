@@ -6,5 +6,6 @@
         <attr name="overlay_cornerRadius" format="dimension" />
         <attr name="overlay_cornerLengthRatio" format="float" />
         <attr name="overlay_sizePercentage" format="float" />
+        <attr name="overlay_verticalBias" format="float" />
     </declare-styleable>
 </resources>

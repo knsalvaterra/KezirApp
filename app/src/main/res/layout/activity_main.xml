@@ -18,16 +18,16 @@
         android:id="@+id/scanner_overlay"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        app:layout_constraintBottom_toTopOf="@+id/flash_toggle_button"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.4"
         app:overlay_borderColor="#FFFFFF"
         app:overlay_borderWidth="8dp"
         app:overlay_cornerLengthRatio="0.1"
         app:overlay_cornerRadius="16dp"
-        app:overlay_sizePercentage="0.55" />
+        app:overlay_sizePercentage="0.55"
+        app:overlay_verticalBias="0.55" />
 
     <View
         android:layout_width="match_parent"
@@ -43,11 +43,11 @@
         android:paddingVertical="12dp"
         android:text="@string/scan_qr_code_label"
         android:textSize="16sp"
-        app:layout_constraintBottom_toBottomOf="@id/scanner_overlay"
+        app:layout_constraintBottom_toBottomOf="@+id/scanner_overlay"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@id/scanner_overlay"
-        app:layout_constraintVertical_bias="0.5" />
+        app:layout_constraintTop_toTopOf="@+id/scanner_overlay"
+        app:layout_constraintVertical_bias="0.25" />
 
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/toolbar"
@@ -62,12 +62,13 @@
 
     <ImageButton
         android:id="@+id/flash_toggle_button"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
-        android:layout_marginBottom="18dp"
+        android:layout_width="42dp"
+        android:layout_height="42dp"
+        android:layout_marginBottom="4dp"
         android:background="@drawable/label_background"
         android:src="@drawable/ic_flash_on"
         app:layout_constraintBottom_toTopOf="@id/bottomPanel"
+
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
@@ -76,10 +77,10 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="16dp"
-        android:layout_marginBottom="16dp"
+        android:layout_marginBottom="22dp"
         app:cardBackgroundColor="#F2FFFFFF"
         app:cardCornerRadius="24dp"
-        app:cardElevation="8dp"
+        app:cardElevation="12dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -89,7 +90,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="24dp"
+            android:padding="16dp"
             >
 
             <TextView
@@ -103,7 +104,7 @@
             <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
+                android:layout_marginTop="8dp"
                 app:boxCornerRadiusBottomEnd="12dp"
                 app:boxCornerRadiusBottomStart="12dp"
                 app:boxCornerRadiusTopEnd="12dp"
@@ -127,7 +128,7 @@
                 style="@style/Widget.Material3.Button.TonalButton"
                 android:layout_width="match_parent"
                 android:layout_height="56dp"
-                android:layout_marginTop="16dp"
+                android:layout_marginTop="8dp"
                 android:enabled="false"
                 android:text="VERIFICAR"
                 android:textColor="#FFFFFF"

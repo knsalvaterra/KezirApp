@@ -34,6 +34,7 @@ class ScannerOverlayView @JvmOverloads constructor(
     private val cornerRadius: Float
     private val cornerLengthRatio: Float
     private val sizePercentage: Float
+    private val verticalBias: Float
     private val path = Path()
     private var isRectManuallySet = false
 
@@ -47,6 +48,7 @@ class ScannerOverlayView @JvmOverloads constructor(
         cornerRadius = typedArray.getDimension(R.styleable.ScannerOverlayView_overlay_cornerRadius, 40f)
         cornerLengthRatio = typedArray.getFloat(R.styleable.ScannerOverlayView_overlay_cornerLengthRatio, 0.1f)
         sizePercentage = typedArray.getFloat(R.styleable.ScannerOverlayView_overlay_sizePercentage, 0.8f)
+        verticalBias = typedArray.getFloat(R.styleable.ScannerOverlayView_overlay_verticalBias, 0.5f)
 
         typedArray.recycle()
 
@@ -85,9 +87,9 @@ class ScannerOverlayView @JvmOverloads constructor(
         val height = viewHeight.toFloat()
         val rectSize = min(width, height) * sizePercentage
         val left = (width - rectSize) / 2
-        val top = (height - rectSize) / 2
+        val top = (height - rectSize)* verticalBias
         val right = left + rectSize
-        val bottom = top + rectSize
+        val bottom = (top + rectSize)
         transparentRect.set(left, top, right, bottom)
     }
 
