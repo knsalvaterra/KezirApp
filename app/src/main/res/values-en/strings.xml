@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="app_name_long">Kezir - Box Office</string>
     <string name="unauthenticated">Unauthenticated. You do not have permission.</string>
     <string name="invalid_ticket_or_connection_error">Invalid ticket or connection error.</string>
     <string name="invalid_pin">Invalid PIN</string>

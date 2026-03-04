@@ -18,8 +18,27 @@ object AuthManager {
     private const val MOCK_SESSION_COOKIE = "m836v1d0grchu3mgu5v2e3ne91"
     private const val PREFS_NAME = "kezir_prefs"
     private const val KEY_EVENT_ID = "event_id"
-    private const val KEY_COOKIE = "session_cookie" //save login details to phone memory
+    private const val KEY_COOKIE = "session_cookie"
 
+
+    private var tempEventId: String? = null
+    private var tempSessionCookie: String? = null
+
+    // saved in ram, temporary
+    fun saveSessionInMemory(eventId: String, cookie: String) {
+        tempEventId = eventId
+        tempSessionCookie = cookie
+    }
+
+    // saved in ram, temporary
+    fun getInMemorySession(): Pair<String, String>? {
+        val id = tempEventId
+        val cookie = tempSessionCookie
+        return if (id != null && cookie != null) id to cookie else null
+    }
+
+
+    //save in disk, persistent
     fun saveSession(context: Context, eventId: String, cookie: String) {
         val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
         prefs.edit()
@@ -27,7 +46,7 @@ object AuthManager {
             .putString(KEY_COOKIE, cookie)
             .apply()
     }
-
+    //save in disk, persistent
     fun getSavedSession(context: Context): Pair<String, String>? {
         val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
         val id = prefs.getString(KEY_EVENT_ID, null)

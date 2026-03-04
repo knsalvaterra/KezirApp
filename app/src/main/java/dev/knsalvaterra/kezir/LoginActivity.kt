@@ -24,14 +24,19 @@ class LoginActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        AuthManager.getSavedSession(this)?.let {
+
+
+
+        AuthManager.getInMemorySession()?.let {
             (id, cookie) ->
             openMainScreen(id, cookie)
             return //skip login screen auto
         }
 
+
+        //https://kezir.app/auth?id=684430880843759616&pin=4966
         val intentUri = intent?.data
-        if (intentUri != null && intentUri.path?.contains("login") == true) {
+        if (intentUri != null && (intentUri.scheme == "kezir" || intentUri.host == "kezir.app")) {
             val linkEventId = intentUri.getQueryParameter("id")
             val linkPin = intentUri.getQueryParameter("pin")
 
@@ -43,11 +48,13 @@ class LoginActivity : AppCompatActivity() {
         setupLoginScreen()
     }
 
+
+    //link
     private fun autologin(pin: String, eventId: String) {
         lifecycleScope.launch {
             val result = AuthManager.login(pin, eventId)
             if (result is LoginResult.Success) {
-                AuthManager.saveSession(this@LoginActivity, result.eventId, result.sessionCookie)
+                AuthManager.saveSessionInMemory(result.eventId, result.sessionCookie)
                 openMainScreen(result.eventId, result.sessionCookie)
             } else {
                 setupLoginScreen()

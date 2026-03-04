@@ -17,7 +17,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Material3.DayNight.NoActionBar"
-        android:label="Kezir - Bilheteria">
+        android:label="@string/app_name_long">
 
         <activity
             android:name=".LoginActivity"
@@ -27,11 +27,18 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
 
-            <intent-filter android:autoVerify="true">
+            <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-                <data android:scheme="https" android:host="kezir.st" android:pathPrefix="/login" />
+
+                <data android:scheme="kezir" />
+                <data android:host="auth" />
+
+                <data android:scheme="http" />
+                <data android:host="kezir.app" />
+                <data android:scheme="https" />
+                <data android:host="kezir.app" />
             </intent-filter>
         </activity>
 

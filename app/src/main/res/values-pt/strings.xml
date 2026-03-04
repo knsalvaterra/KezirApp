@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="app_name_long">Kezir - Bilheteira</string>
     <string name="unauthenticated">Acesso não autorizado. Não tens permissões para continuar.</string>
     <string name="invalid_ticket_or_connection_error">Bilhete inválido ou problema de ligação.</string>
     <string name="invalid_pin">PIN incorreto</string>
