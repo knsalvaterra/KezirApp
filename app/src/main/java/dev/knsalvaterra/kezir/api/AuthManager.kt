@@ -1,5 +1,6 @@
 package dev.knsalvaterra.kezir.api
 
+import android.content.Context
 import android.util.Log
 import dev.knsalvaterra.kezir.R
 
@@ -15,7 +16,24 @@ sealed class LoginResult { //
 object AuthManager {
     // muckup login with this cookie m836v1d0grchu3mgu5v2e3ne91
     private const val MOCK_SESSION_COOKIE = "m836v1d0grchu3mgu5v2e3ne91"
+    private const val PREFS_NAME = "kezir_prefs"
+    private const val KEY_EVENT_ID = "event_id"
+    private const val KEY_COOKIE = "session_cookie" //save login details to phone memory
 
+    fun saveSession(context: Context, eventId: String, cookie: String) {
+        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        prefs.edit()
+            .putString(KEY_EVENT_ID, eventId)
+            .putString(KEY_COOKIE, cookie)
+            .apply()
+    }
+
+    fun getSavedSession(context: Context): Pair<String, String>? {
+        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        val id = prefs.getString(KEY_EVENT_ID, null)
+        val cookie = prefs.getString(KEY_COOKIE, null)
+        return if (id != null && cookie != null) id to cookie else null
+    }
     suspend fun login(sessionCookie: String): LoginResult {
         return LoginResult.Success("664544741697781760", sessionCookie)
         }

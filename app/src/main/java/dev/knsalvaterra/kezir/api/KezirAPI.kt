@@ -176,44 +176,39 @@ object TicketManager {
         code: String,
         eventId: String?
     ): TicketResult {
-        if (eventId == null) {
-            return TicketResult.Error("Event ID is missing.")
-        }
+        if (eventId == null) return TicketResult.Error("Event ID missing")
 
+        return try {//online
+            val response = ApiClient.api.verifyCode(sessionCookie, VerifyRequest(code, eventId))
 
-        return try {
-            val response = ApiClient.api.verifyCode(
-                sessionCookie,
-                VerifyRequest(code, eventId)
-            )
+            if (response.success && response.order != null) {
+                //  cache this ticket in Room for future offline use
+                cacheTicketLocally(context, code, eventId, response.order)
 
-            if (response.success) {
-            //    val ticketDao = AppDatabase.getDatabase(context).ticketDao()
-            //    val storedTicket = StoredTicket(
-            //        code = code,
-            //        buyerName = response.order.buyer_name,
-            //        buyerPhone = response.order.buyer_phone,
-            //        ticketType = response.order.tickets.first().ticket_type,
-            //        ticketName = response.order.tickets.first().ticket_name,
-            //        tableCapacity = response.order.tickets.first().table_capacity,
-            //        quantity = response.order.tickets.first().quantity,
-            //        eventId = eventId
-            //    )
-            //    withContext(Dispatchers.IO) {
-            //        ticketDao.insertTicket(storedTicket)
-            //    }
-
-                return TicketResult.Success(
-                    response.message ?: "Success",
-                    response.order
-                )
+                TicketResult.Success(response.message ?: "Sucesso", response.order)
             } else {
-                return TicketResult.Error(response.message ?: "Invalid ticket.")
+                TicketResult.Error(response.message ?: "Bilhete inválido")
             }
         } catch (e: Exception) {
-            Log.e("TicketManager", "Verification request failed", e)
-            //   TicketResult.Error("Verification failed. Check network connection")
-            TicketResult.Error("Código de bilhete não encontrado ou já foi utilizado.")
-    }
+            // offline  network fails, check local database
+            Log.e("TicketManager", "Network failed, checking offline DB")
+            verifyTicketOffline(context, code)
         }
+    }
+
+    private suspend fun cacheTicketLocally(context: Context, code: String, eventId: String, order: Order) {
+        val ticketDao = AppDatabase.getDatabase(context).ticketDao()
+        val stored = StoredTicket(
+            code = code,
+            eventId = eventId,
+            buyerName = order.buyer_name,
+            buyerPhone = order.buyer_phone,
+            ticketType = order.tickets.firstOrNull()?.ticket_type ?: "",
+            ticketName = order.tickets.firstOrNull()?.ticket_name ?: "",
+            quantity = order.tickets.firstOrNull()?.quantity ?: "1"
+            ,
+            tableCapacity = null
+        )
+        withContext(Dispatchers.IO) { ticketDao.insertTicket(stored) }
+    }
 }

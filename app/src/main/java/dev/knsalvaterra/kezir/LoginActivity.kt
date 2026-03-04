@@ -24,7 +24,36 @@ class LoginActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        AuthManager.getSavedSession(this)?.let {
+            (id, cookie) ->
+            openMainScreen(id, cookie)
+            return //skip login screen auto
+        }
+
+        val intentUri = intent?.data
+        if (intentUri != null && intentUri.path?.contains("login") == true) {
+            val linkEventId = intentUri.getQueryParameter("id")
+            val linkPin = intentUri.getQueryParameter("pin")
+
+            if (!linkEventId.isNullOrEmpty() && !linkPin.isNullOrEmpty()) {
+                autologin(linkPin, linkEventId)
+                return
+            }
+        }
         setupLoginScreen()
+    }
+
+    private fun autologin(pin: String, eventId: String) {
+        lifecycleScope.launch {
+            val result = AuthManager.login(pin, eventId)
+            if (result is LoginResult.Success) {
+                AuthManager.saveSession(this@LoginActivity, result.eventId, result.sessionCookie)
+                openMainScreen(result.eventId, result.sessionCookie)
+            } else {
+                setupLoginScreen()
+                Toast.makeText(this@LoginActivity, "Link de login inválido", Toast.LENGTH_SHORT).show()
+            }
+        }
     }
 
     private fun setupLoginScreen() {
