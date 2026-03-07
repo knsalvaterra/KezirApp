@@ -15,10 +15,10 @@
     <string name="label_buyer_name">Portador do Bilhete</string>
     <string name="label_buyer_phone">Número de Telefone</string>
     <string name="button_label_continue">CONTINUAR</string>
-    <string name="session_cookie_not_found">Session cookie not found in response.</string>
+    <string name="session_cookie_not_found">Cookie de sessão não encontrado.</string>
     <string name="invalid_pin_or_event_id">PIN ou ID do evento inválido.</string>
-    <string name="auth_manager_log_tag">AuthManager</string>
-    <string name="login_request_failed">Login request failed</string>
+    <string name="auth_manager_log_tag" translatable="false">AuthManager</string>
+    <string name="login_request_failed">Falha no pedido de login</string>
     <string name="login_failed_check_connection">Não foi possível iniciar sessão. Verifica a tua ligação à internet.</string>
     <string name="session_invalid">Sessão inválida. Tenta novamente.</string>
     <string name="qr_code_not_found">Código QR não encontrado.</string>
@@ -32,7 +32,7 @@
     <string name="label_button_login">Login</string>
     <string name="label_pin">PIN</string>
     <string name="label_eventid">Event ID</string>
-    <string name="ticket_code_is">"Código do bilhete: "</string>
+    <string name="ticket_code_is">Código do bilhete: %s</string>
     <string name="camera_permission_title">Permissão da câmara necessária</string>
     <string name="camera_permission_message">Esta aplicação precisa de acesso à câmara para ler códigos QR. Por favor, concede a permissão nas definições da aplicação.</string>
     <string name="camera_permission_settings">Definições</string>
@@ -47,4 +47,23 @@
     <string name="search_error">Erro na pesquisa</string>
     <string name="search_no_internet">Verifique a sua internet</string>
     <string name="login_search_helper">Clique na lupa para selecionar o evento</string>
+
+    <string name="logout_title">Encerrar Sessão</string>
+    <string name="logout_message">Deseja sair e voltar ao ecrã de login?</string>
+    <string name="logout_confirm">Sair</string>
+    <string name="logout_cancel">Cancelar</string>
+    <string name="login_pin_hint">Insira o PIN</string>
+    <string name="login_fill_fields">Preencha os campos Event ID e PIN</string>
+    <string name="event_via_link">Evento via Link</string>
+    <string name="not_available">N/A</string>
+
+    <string name="ticket_error_no_id">ID do evento em falta.</string>
+    <string name="ticket_error_default">Bilhete inválido.</string>
+    <string name="ticket_error_not_found">Código de bilhete não encontrado ou já foi utilizado.</string>
+    <string name="ticket_error_offline_invalid">Código de bilhete offline inválido</string>
+    <string name="ticket_verified_offline">Código verificado offline!</string>
+    <string name="quantity_format">x%s</string>
+    <string name="search_hint_event">Sugestão: Festa da Cidade</string>
+    <string name="search_hint_location">Praça Central</string>
+    <string name="ticket_already_verified">Este bilhete já foi verificado anteriormente</string>
 </resources>

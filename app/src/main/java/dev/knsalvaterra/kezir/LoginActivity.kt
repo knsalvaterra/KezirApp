@@ -17,7 +17,7 @@ class LoginActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityLoginBinding
     
-    // Toggle this to allow or prevent manual input of Event ID
+
     private val allowManualEventIdInput = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -30,7 +30,7 @@ class LoginActivity : AppCompatActivity() {
 
         initializeUI()
         
-        // Start pre-loading events as soon as the app opens to make searching instantaneous
+        //  pre-loading events as soon as the app opens to make searching fast
         SearchEventBottomSheet.preloadEvents()
         
         val intentUri = intent?.data
@@ -39,6 +39,9 @@ class LoginActivity : AppCompatActivity() {
             if (!linkEventId.isNullOrEmpty()) {
                 binding.eventIdEditText.setText(linkEventId)
             }
+        } else {
+
+            openSearch()
         }
     }
 
@@ -60,7 +63,6 @@ class LoginActivity : AppCompatActivity() {
         binding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // Configure Event ID input based on the toggle
         binding.eventIdEditText.apply {
             isFocusable = allowManualEventIdInput
             isFocusableInTouchMode = allowManualEventIdInput
@@ -73,7 +75,7 @@ class LoginActivity : AppCompatActivity() {
             }
         }
 
-        // Set search icon click listener to open the bottom sheet
+
         binding.eventIdInputLayout.setEndIconOnClickListener {
             openSearch()
         }
@@ -92,7 +94,7 @@ class LoginActivity : AppCompatActivity() {
                     }
                 }
             } else {
-                Toast.makeText(this, "Preencha os campos Event ID e PIN", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, getString(R.string.login_fill_fields), Toast.LENGTH_SHORT).show()
             }
         }
     }
@@ -101,6 +103,7 @@ class LoginActivity : AppCompatActivity() {
         SearchEventBottomSheet { event ->
             binding.eventIdEditText.setText(event.id)
             binding.pinEditText.requestFocus()
+            Toast.makeText(this, getString(R.string.login_pin_hint), Toast.LENGTH_SHORT).show()
         }.show(supportFragmentManager, "search_event")
     }
 

@@ -43,6 +43,10 @@
         android:paddingVertical="10dp"
         android:text="@string/scan_qr_code_label"
         android:textSize="16sp"
+        android:textColor="#FFFFFF"
+        android:gravity="center"
+        app:drawableStartCompat="@drawable/ic_qr_code_scanner"
+        android:drawablePadding="8dp"
         app:layout_constraintBottom_toBottomOf="@+id/scanner_overlay"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -58,7 +62,20 @@
         app:title="@string/app_toolbar_title"
         app:titleCentered="true"
         app:titleTextAppearance="@style/TextAppearance.Material3.TitleLarge"
-        app:titleTextColor="#FFFFFF"/>
+        app:titleTextColor="#FFFFFF">
+
+        <ImageButton
+            android:id="@+id/logoutButton"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_gravity="end"
+            android:layout_marginEnd="16dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="Logout"
+            android:src="@drawable/ic_logout"
+            app:tint="#FFFFFF" />
+
+    </com.google.android.material.appbar.MaterialToolbar>
 
     <ImageButton
         android:id="@+id/flash_toggle_button"
@@ -68,7 +85,6 @@
         android:background="@drawable/label_background"
         android:src="@drawable/ic_flash_on"
         app:layout_constraintBottom_toTopOf="@id/bottomPanel"
-
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
@@ -90,8 +106,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="16dp"
-            >
+            android:padding="16dp">
 
             <TextView
                 android:layout_width="wrap_content"
@@ -133,6 +148,10 @@
                 android:text="@string/label_button_verify"
                 android:textColor="#FFFFFF"
                 android:textSize="18sp"
+                app:icon="@drawable/ic_qr_code_scanner"
+                app:iconGravity="textStart"
+                app:iconPadding="8dp"
+                app:iconTint="#FFFFFF"
                 app:backgroundTint="@color/button_tint_selector"
                 app:cornerRadius="16dp" />
 

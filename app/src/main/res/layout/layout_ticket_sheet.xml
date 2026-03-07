@@ -8,7 +8,7 @@
     android:orientation="vertical"
     android:paddingTop="20dp">
 
-    <!-- stat8us -->
+    <!-- status header -->
     <LinearLayout
         android:id="@+id/sheetHeaderBar"
         android:layout_width="match_parent"
@@ -34,7 +34,7 @@
                 android:layout_width="36dp"
                 android:layout_height="36dp"
                 android:layout_gravity="center"
-                android:contentDescription="TODO"
+                android:contentDescription="Status Icon"
                 android:src="@drawable/ic_check_circle"
                 app:tint="@color/green_600" />
 
@@ -50,7 +50,7 @@
             android:text="@string/status_ticket_valid"
             android:textAllCaps="true"
             android:textAppearance="?attr/textAppearanceHeadlineSmall"
-            android:textColor="?attr/colorOnPrimary"
+            android:textColor="#FFFFFF"
             android:textStyle="bold"
             tools:text="@string/status_ticket_valid" />
 
@@ -63,7 +63,7 @@
             android:alpha="0.9"
             android:text="@string/status_subtitle_success"
             android:textAppearance="?attr/textAppearanceBodyMedium"
-            android:textColor="?attr/colorOnPrimary"
+            android:textColor="#FFFFFF"
             tools:text="@string/status_subtitle_success" />
 
     </LinearLayout>
@@ -87,10 +87,11 @@
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:cardBackgroundColor="#F1E9F6"
+                app:cardBackgroundColor="#E7E7E7"
                 app:cardCornerRadius="16dp"
                 app:cardElevation="0dp"
-                app:strokeWidth="0dp">
+                app:strokeWidth="1dp"
+                app:strokeColor="#E2E2E2">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -110,7 +111,7 @@
                             android:layout_width="16dp"
                             android:layout_height="16dp"
                             android:src="@drawable/ic_person"
-                            app:tint="?attr/colorOnSurfaceVariant" />
+                            app:tint="#5F5D66" />
 
                         <TextView
                             android:id="@+id/buyerNameLabel"
@@ -120,7 +121,7 @@
                             android:letterSpacing="0.1"
                             android:text="@string/label_buyer_name"
                             android:textAppearance="?attr/textAppearanceLabelMedium"
-                            android:textColor="?attr/colorOnSurfaceVariant"
+                            android:textColor="#5F5D66"
                             android:textAllCaps="true" />
 
                     </LinearLayout>
@@ -132,7 +133,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
                         android:textAppearance="?attr/textAppearanceHeadlineMedium"
-                        android:textColor="?attr/colorOnSurface"
+                        android:textColor="#212121"
                         android:textStyle="bold"
                         tools:text="Kenedy Salvaterra" />
 
@@ -149,7 +150,7 @@
                             android:layout_width="16dp"
                             android:layout_height="16dp"
                             android:src="@drawable/ic_phone"
-                            app:tint="?attr/colorOnSurfaceVariant" />
+                            app:tint="#5F5D66" />
 
                         <TextView
                             android:id="@+id/buyerPhoneLabel"
@@ -159,7 +160,7 @@
                             android:letterSpacing="0.1"
                             android:text="@string/label_buyer_phone"
                             android:textAppearance="?attr/textAppearanceLabelMedium"
-                            android:textColor="?attr/colorOnSurfaceVariant"
+                            android:textColor="#5F5D66"
                             android:textAllCaps="true" />
 
                     </LinearLayout>
@@ -171,7 +172,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
                         android:textAppearance="?attr/textAppearanceHeadlineMedium"
-                        android:textColor="?attr/colorOnSurface"
+                        android:textColor="#212121"
                         android:textStyle="bold"
                         tools:text="+*** *** ****" />
 
@@ -190,17 +191,19 @@
                 android:text="@string/label_ticket_details"
                 android:textAllCaps="true"
                 android:textAppearance="?attr/textAppearanceTitleSmall"
-                android:textColor="?attr/colorOnSurfaceVariant"
+                android:textColor="#5F5D66"
                 android:textStyle="bold" />
 
             <!-- ticket details card -->
             <com.google.android.material.card.MaterialCardView
+                android:id="@+id/ticketDetailsContainerCard"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:cardBackgroundColor="#F1E9F6"
+                app:cardBackgroundColor="#E7E7E7"
                 app:cardCornerRadius="16dp"
                 app:cardElevation="0dp"
-                app:strokeWidth="0dp">
+                app:strokeWidth="1dp"
+                app:strokeColor="#E2E2E2">
 
                 <LinearLayout
                     android:id="@+id/ticketDetailsContainer"
@@ -237,9 +240,9 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="12dp"
                     android:layout_weight="1"
-                    android:text="Este bilhete já foi verificado anteriormente"
+                    android:text="@string/ticket_already_verified"
                     android:textAppearance="?attr/textAppearanceBodyMedium"
-                    android:textColor="?attr/colorOnSurfaceVariant"
+                    android:textColor="#5F5D66"
                     tools:text="Este bilhete já foi verificado anteriormente" />
 
             </LinearLayout>
@@ -266,7 +269,7 @@
         android:layout_margin="24dp"
         android:text="@string/button_label_continue"
         android:textAppearance="?attr/textAppearanceLabelLarge"
-        android:textColor="?attr/colorOnPrimary"
+        android:textColor="#FFFFFF"
         android:textSize="16sp"
         android:textAllCaps="true"
         app:backgroundTint="@color/button_tint_selector"

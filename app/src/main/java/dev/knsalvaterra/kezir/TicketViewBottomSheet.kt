@@ -151,8 +151,8 @@ class TicketViewBottomSheet(
             buyerName.text = it.buyer_name
             buyerPhone.text = censorPhoneNumber(it.buyer_phone)
         } ?: run {
-            buyerName.text = "N/A"
-            buyerPhone.text = "N/A"
+            buyerName.text = getString(R.string.not_available)
+            buyerPhone.text = getString(R.string.not_available)
         }
 
         ticketDetailsContainer.removeAllViews()
@@ -209,12 +209,9 @@ class TicketViewBottomSheet(
         statusText.text = getString(R.string.status_ticket_invalid)
         statusSubtitle.text = getString(R.string.status_subtitle_failure)
 
-     //   buyerNameLabel.visibility = View.GONE
-     //   buyerLabelIcon.visibility = View.GONE
-     //   buyerName.visibility = View.GONE
         statusSubtitle.visibility = View.GONE
 
-        buyerName.text = "N/A"
+        buyerName.text = getString(R.string.not_available)
 
         buyerPhoneLabel.visibility = View.GONE
         buyerPhoneIcon.visibility = View.GONE

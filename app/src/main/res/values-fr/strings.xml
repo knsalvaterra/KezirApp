@@ -47,4 +47,26 @@
     <string name="search_continue_typing">Continuez à taper…</string>
     <string name="search_error">Erreur de recherche</string>
     <string name="search_no_internet">Vérifiez votre connexion internet</string>
+    <string name="login_search_helper">Cliquez sur la loupe pour sélectionner l\'événement</string>
+
+    <string name="logout_title">Fermer la session</string>
+    <string name="logout_message">Voulez-vous vous déconnecter et revenir à l\'écran de connexion ?</string>
+    <string name="logout_confirm">Se déconnecter</string>
+    <string name="logout_cancel">Annuler</string>
+    <string name="login_pin_hint">Insérez le PIN</string>
+    <string name="login_fill_fields">Remplissez les champs Event ID et PIN</string>
+    <string name="event_via_link">Événement via le lien</string>
+    <string name="not_available">N/A</string>
+    <string name="ticket_error_no_id">ID de l\'événement manquant.</string>
+    <string name="ticket_error_default">Billet invalide.</string>
+    <string name="ticket_error_not_found">Le code du billet n\'a pas été trouvé ou a déjà été utilisé.</string>
+    <string name="ticket_error_offline_invalid">Code de billet hors ligne invalide</string>
+    <string name="ticket_verified_offline">Code vérifié hors ligne !</string>
+    <string name="quantity_format">x%s</string>
+    <string name="search_hint_event">Suggestion : Fête de la ville</string>
+    <string name="search_hint_location">Place centrale</string>
+    <string name="logout_dialog_title">Déconnexion</string>
+    <string name="logout_dialog_message">Voulez-vous retourner à la connexion ?</string>
+    <string name="logout_dialog_yes">Oui</string>
+    <string name="logout_dialog_no">Non</string>
 </resources>

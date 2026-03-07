@@ -47,4 +47,13 @@
     <string name="search_error">Erro na pesquisa</string>
     <string name="search_no_internet">Verifique a sua internet</string>
     <string name="login_search_helper">Clique na lupa para selecionar o evento</string>
+
+    <string name="logout_title">Encerrar Sessão</string>
+    <string name="logout_message">Deseja sair e voltar ao ecrã de login?</string>
+    <string name="logout_confirm">Sair</string>
+    <string name="logout_cancel">Cancelar</string>
+    <string name="login_pin_hint">Insira o PIN</string>
+    <string name="login_fill_fields">Preencha os campos Event ID e PIN</string>
+    <string name="event_via_link">Evento via Link</string>
+    <string name="not_available">N/A</string>
 </resources>

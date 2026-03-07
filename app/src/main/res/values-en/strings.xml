@@ -32,7 +32,7 @@
     <string name="label_button_login">Login</string>
     <string name="label_pin">PIN</string>
     <string name="label_eventid">Event ID</string>
-    <string name="ticket_code_is">Ticket code:</string>
+    <string name="ticket_code_is">"Ticket code: "</string>
     <string name="camera_permission_title">Camera permission required</string>
     <string name="camera_permission_message">This app needs camera access to scan QR codes. Please grant the permission in the app settings.</string>
     <string name="camera_permission_settings">Settings</string>
@@ -46,4 +46,14 @@
     <string name="search_continue_typing">Continue typing…</string>
     <string name="search_error">Search error</string>
     <string name="search_no_internet">Check your internet connection</string>
+    <string name="login_search_helper">Click the magnifying glass to select event</string>
+
+    <string name="logout_title">Logout</string>
+    <string name="logout_message">Do you want to log out and return to the login screen?</string>
+    <string name="logout_confirm">Logout</string>
+    <string name="logout_cancel">Cancel</string>
+    <string name="login_pin_hint">Enter PIN</string>
+    <string name="login_fill_fields">Fill Event ID and PIN fields</string>
+    <string name="event_via_link">Event via Link</string>
+    <string name="not_available">N/A</string>
 </resources>

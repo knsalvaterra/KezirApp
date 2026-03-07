@@ -1,6 +1,10 @@
 package dev.knsalvaterra.kezir
 
+import android.content.Context
+import android.os.Build
 import android.os.Bundle
+import android.os.VibrationEffect
+import android.os.Vibrator
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.LayoutInflater
@@ -47,12 +51,23 @@ class SearchEventBottomSheet(private val onEventSelected: (Event) -> Unit) : Bot
 
     private fun setupRecyclerView() {
         eventAdapter = EventAdapter { event ->
+            vibrate()
             onEventSelected(event)
             dismiss()
         }
         binding.eventsRecyclerView.apply {
             adapter = eventAdapter
             itemAnimator = null
+        }
+    }
+//mayube make a util cuz i already havbe this in main
+    private fun vibrate() {
+        val vibrator = requireContext().getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            vibrator.vibrate(VibrationEffect.createOneShot(50, VibrationEffect.DEFAULT_AMPLITUDE))
+        } else {
+            @Suppress("DEPRECATION")
+            vibrator.vibrate(50)
         }
     }
 
@@ -136,7 +151,7 @@ class SearchEventBottomSheet(private val onEventSelected: (Event) -> Unit) : Bot
         private var preloadedEvents: List<Event> = emptyList()
 
         /**
-         * Pre-fetches all events from the API.
+         * pre-fetches all events from the API.
          */
         fun preloadEvents() {
             @Suppress("OPT_IN_USAGE")

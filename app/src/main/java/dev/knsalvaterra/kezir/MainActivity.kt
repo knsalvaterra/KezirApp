@@ -62,12 +62,9 @@ class MainActivity : AppCompatActivity() {
     private lateinit var cameraProvider: ProcessCameraProvider
     private var camera: Camera? = null
     
-    
-    
     private lateinit var scanArea: RectF
     private var lastInvalidCode: String? = null
     private var lastInvalidScanTime: Long = 0
-    
     
     private var isFlashOn = false
 
@@ -77,7 +74,6 @@ class MainActivity : AppCompatActivity() {
     private var isScanning: Boolean = false
 
     private val scanDuration = 850L
-
 
     companion object {
         private val VIBRATION_SUCCESS_PATTERN = longArrayOf(0, 150)
@@ -109,7 +105,6 @@ class MainActivity : AppCompatActivity() {
             .show()
     }
 
-
     private fun vibrate(pattern: LongArray) {
         val vibrator = getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -120,25 +115,13 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-   // private fun cameraScannerInit() {
-   //     cameraExecutor = Executors.newSingleThreadExecutor()
-//
-   //     barcodeScanner = BarcodeScanning.getClient(
-   //         BarcodeScannerOptions.Builder()
-   //             .setBarcodeFormats(Barcode.FORMAT_QR_CODE)
-   //             .build()
-   //     )
-   // }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
         eventId = intent.getStringExtra("EVENT_ID")
-        currentSessionCookie = intent.getStringExtra("SESSION_COOKIE") //gathered from login activity, mioght change later
-
-
+        currentSessionCookie = intent.getStringExtra("SESSION_COOKIE")
 
         if (!isValidSession()) {
             Toast.makeText(this, getString(R.string.session_invalid), Toast.LENGTH_LONG).show()
@@ -146,25 +129,13 @@ class MainActivity : AppCompatActivity() {
             return
         }
 
-       // cameraScannerInit()
-
         binding.manualInput.addTextChangedListener(object : TextWatcher {
-
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
             override fun afterTextChanged(s: Editable?) {
                 updateButtonState()
             }
         })
-     //   binding.manualInput.setOnFocusChangeListener { _, hasFocus ->
-//
-     //       if (hasFocus && binding.manualInput.text.toString().trim().isEmpty()) {
-     //         //  binding.manualInput.hint = "Inserir código do Bilhete"
-     //       } else {
-     //         //  binding.manualInput.hint = ""
-     //       }
-     //   }
-
 
         binding.scanButton.setOnClickListener {
             val code = binding.manualInput.text.toString().trim()
@@ -184,7 +155,6 @@ class MainActivity : AppCompatActivity() {
             } else if (validCodeFormat(code)) {
                 verifyCode(code)
                 runOnUiThread {
-
                     vibrate(VIBRATION_SUCCESS_PATTERN)
                 }
             }
@@ -195,20 +165,16 @@ class MainActivity : AppCompatActivity() {
             updateFlashState()
         }
 
-        updateButtonState() // initial state
-//unfocus when click outside are
+        binding.logoutButton.setOnClickListener {
+            // Use the fancy LogoutBottomSheet instead of a standard alert
+            LogoutBottomSheet().show(supportFragmentManager, "logout_sheet")
+        }
+
+        updateButtonState()
 
         binding.viewFinder.post {
             updateScannerOverlay(binding.scannerOverlay.sizePercentage(), binding.scannerOverlay.verticalBias())
-      
-            binding.scannerOverlay.setOnClickListener {
-             //   binding.manualInput.requestFocus()
-                //open keyboard
-
-
-
-            }
-
+            
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
                 startCamera()
             } else {
@@ -230,7 +196,7 @@ class MainActivity : AppCompatActivity() {
         scanArea = RectF(left, top, right, bottom)
         binding.scannerOverlay.setTransparentRectangle(scanArea)
     }
-//todo move every hardcoded string to @android/strings resource
+
     private fun updateButtonState() {
         if (isScanning) {
             binding.scanButton.text = getString(R.string.label_button_scanning)
@@ -290,7 +256,7 @@ class MainActivity : AppCompatActivity() {
             return
         }
 
-        shouldScan = false // per click migght add a delay too
+        shouldScan = false
 
         val imageScanArea = getTransformedScanArea(imageProxy)
         if (imageScanArea.isEmpty) {
@@ -298,13 +264,8 @@ class MainActivity : AppCompatActivity() {
             return
         }
 
-
         try {
-
-
             val mediaImage = imageProxy.image
-
-
             if (mediaImage == null) {
                 imageProxy.close()
                 return
@@ -315,18 +276,12 @@ class MainActivity : AppCompatActivity() {
 
             barcodeScanner.process(image)
                 .addOnSuccessListener { barcodes ->
-
                     var scannedBarcode: Barcode? = null
-
-
                     for (barcode in barcodes) {
                         val boundingBox = barcode.boundingBox
                         if (boundingBox != null) {
-
                             val barcodeRect = boundingBox.toRectF()
-                            if (imageScanArea.intersect(barcodeRect)) { //intersect only requires part of the code to be seen while cointains requires the entire code to be in frame
-
-
+                            if (imageScanArea.intersect(barcodeRect)) {
                                 scannedBarcode = barcode
                                 break
                             }
@@ -341,9 +296,7 @@ class MainActivity : AppCompatActivity() {
                         }
                     }
                 }
-
                 .addOnFailureListener { exception ->
-
                     Log.e("Scanner", "Barcode scanning failed", exception)
                 }
                 .addOnCompleteListener {
@@ -355,8 +308,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-
-    //androidstudiox library
     @OptIn(ExperimentalGetImage::class)
     private fun getTransformedScanArea(imageProxy: ImageProxy): RectF {
         val mediaImage = imageProxy.image ?: return RectF()
@@ -395,7 +346,6 @@ class MainActivity : AppCompatActivity() {
             return
         }
 
-
         if (validCodeFormat(code)) {
             lastInvalidCode = null
             runOnUiThread {
@@ -405,10 +355,8 @@ class MainActivity : AppCompatActivity() {
             verifyCode(code)
             Toast.makeText(this, getString(R.string.ticket_code_is) + " " + code, Toast.LENGTH_SHORT).show()
         } else {
-
-            //non valid
             val now = System.currentTimeMillis()
-            if (lastInvalidCode != code || now - lastInvalidScanTime > 3000) { // cooldown
+            if (lastInvalidCode != code || now - lastInvalidScanTime > 3000) {
                 lastInvalidCode = code
                 lastInvalidScanTime = now
                 runOnUiThread {
@@ -420,7 +368,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun validCodeFormat(code: String): Boolean {
-        //code.length == 6
         return code.isNotEmpty() && code.all { it.isDigit() }
     }
 
