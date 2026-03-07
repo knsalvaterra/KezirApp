@@ -6,40 +6,49 @@
     android:layout_height="wrap_content"
     android:background="@drawable/bottom_sheet_background"
     android:orientation="vertical"
-    android:padding="24dp"
-    android:minHeight="500dp">
+    android:paddingHorizontal="12dp"
+    android:paddingBottom="32dp">
 
+    <!-- Draggable handle for modern feel -->
     <View
-        android:layout_width="40dp"
-        android:layout_height="4dp"
+        android:id="@+id/dragHandle"
+        android:layout_width="48dp"
+        android:layout_height="5dp"
+        android:layout_marginTop="12dp"
         android:layout_gravity="center_horizontal"
-        android:layout_marginBottom="24dp"
-        android:background="#E0E0E0" />
+        android:background="#D1D1D1"
+        android:backgroundTint="#D1D1D1" />
 
     <TextView
         android:id="@+id/titleSearch"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Procurar Evento"
+        android:layout_marginStart="12dp"
+        android:layout_marginTop="24dp"
+        android:text="@string/search_event_title"
         android:textColor="#212121"
-        android:textSize="24sp"
+        android:textSize="26sp"
         android:textStyle="bold" />
 
+    <!-- Search box consistent with Login fields -->
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/searchEventInputLayout"
         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        android:hint="Pesquisar por nome..."
+        android:layout_marginTop="24dp"
+        android:layout_marginHorizontal="4dp"
+        android:hint="@string/search_event_hint"
         android:textColorHint="#5F5D66"
-        app:boxCornerRadiusBottomEnd="16dp"
-        app:boxCornerRadiusBottomStart="16dp"
-        app:boxCornerRadiusTopEnd="16dp"
-        app:boxCornerRadiusTopStart="16dp"
+        app:hintTextColor="#5F5D66"
+        app:boxCornerRadiusBottomEnd="12dp"
+        app:boxCornerRadiusBottomStart="12dp"
+        app:boxCornerRadiusTopEnd="12dp"
+        app:boxCornerRadiusTopStart="12dp"
         app:boxStrokeWidth="0dp"
+        app:boxStrokeWidthFocused="0dp"
         app:startIconDrawable="@drawable/ic_search"
-        app:startIconTint="@color/on_surface">
+        app:startIconTint="@color/chill_green">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/searchEventEditText"
@@ -47,20 +56,47 @@
             android:layout_height="wrap_content"
             android:background="@drawable/input_bg_rounded"
             android:textColor="#282828"
-            android:paddingVertical="14dp"
-            android:maxLines="1" />
+            android:paddingVertical="18dp"
+            android:textSize="16sp"
+            android:maxLines="1"
+            android:imeOptions="actionSearch"
+            android:inputType="text" />
 
     </com.google.android.material.textfield.TextInputLayout>
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/eventsRecyclerView"
+    <!-- Content area: wrap_content with NO minHeight to avoid empty space -->
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_marginTop="16dp"
-        android:layout_weight="1"
-        android:clipToPadding="false"
-        android:paddingBottom="16dp"
-        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-        tools:listitem="@layout/item_event" />
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/eventsRecyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:clipToPadding="false"
+            android:paddingBottom="8dp"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            tools:listitem="@layout/item_event" />
+
+        <ProgressBar
+            android:id="@+id/searchProgressBar"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_gravity="center"
+            android:visibility="gone"
+            android:indeterminateTint="@color/chill_green" />
+
+        <TextView
+            android:id="@+id/emptyStateTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginVertical="16dp"
+            android:text="@string/search_no_results"
+            android:textColor="#757575"
+            android:textSize="16sp"
+            android:visibility="gone" />
+    </FrameLayout>
 
 </LinearLayout>

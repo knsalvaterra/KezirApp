@@ -11,8 +11,6 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import dev.knsalvaterra.kezir.api.ApiClient
 import dev.knsalvaterra.kezir.api.Event
 import dev.knsalvaterra.kezir.databinding.LayoutSearchEventBinding
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 class SearchEventBottomSheet(private val onEventSelected: (Event) -> Unit) : BottomSheetDialogFragment() {
@@ -20,7 +18,9 @@ class SearchEventBottomSheet(private val onEventSelected: (Event) -> Unit) : Bot
     private var _binding: LayoutSearchEventBinding? = null
     private val binding get() = _binding!!
     private lateinit var eventAdapter: EventAdapter
-    private var searchJob: Job? = null
+    private var allEvents: List<Event> = emptyList()
+
+    override fun getTheme(): Int = R.style.CustomBottomSheetDialogTheme
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -34,59 +34,98 @@ class SearchEventBottomSheet(private val onEventSelected: (Event) -> Unit) : Bot
     override fun onViewCreated(view: View, bundle: Bundle?) {
         super.onViewCreated(view, bundle)
 
+        setupRecyclerView()
+        setupSearchLogic()
+        
+        // Automatically load all available events on startup
+        fetchAllEvents()
+    }
+
+    private fun setupRecyclerView() {
         eventAdapter = EventAdapter { event ->
             onEventSelected(event)
             dismiss()
         }
-        binding.eventsRecyclerView.adapter = eventAdapter
-
-        // Ensure test events are displayed immediately when ready
-        binding.eventsRecyclerView.post {
-            showTestEvents()
+        binding.eventsRecyclerView.apply {
+            adapter = eventAdapter
+            itemAnimator = null 
         }
+    }
 
+    private fun setupSearchLogic() {
         binding.searchEventEditText.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-
-
-            }
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
             override fun afterTextChanged(s: Editable?) {
-                val query = s.toString().trim()
-                if (query.length >= 3) {
-                    searchEvents(query)
-                } else if (query.isEmpty()) {
-                    showTestEvents()
-                }
+                filterEvents(s.toString().trim())
             }
         })
     }
 
-    private fun showTestEvents() {
-        val testEvents = listOf(
-            Event("664544741697781760", "Evento de Teste 1", "20 Mai 2024", "Lisboa, Portugal"),
-            Event("2", "Concerto de Verão", "15 Jun 2024", "Porto, Portugal"),
-            Event("3", "Conferência Tech", "10 Jul 2024", "S. Tomé"),
-            Event("4", "Festival de Arte", "05 Ago 2024", "Cascais, Portugal"),
-            Event("5", "Maratona Kezir", "12 Set 2024", "Funchal, Madeira")
-        )
-        eventAdapter.submitList(testEvents)
-    }
-
-    private fun searchEvents(query: String) {
-        searchJob?.cancel()
-        searchJob = lifecycleScope.launch {
-            delay(300)
+    private fun fetchAllEvents() {
+        showLoading()
+        lifecycleScope.launch {
             try {
-                val response = ApiClient.api.searchEvents(query)
+                // Fetching all events (passing empty query to the API)
+                val response = ApiClient.api.searchEvents("")
+                hideLoading()
+                
                 if (response.isSuccessful) {
-                    val results = response.body() ?: emptyList()
-                    eventAdapter.submitList(results)
+                    allEvents = response.body()?.events ?: emptyList()
+                    eventAdapter.submitList(allEvents)
+                    
+                    if (allEvents.isEmpty()) {
+                        binding.emptyStateTextView.apply {
+                            text = getString(R.string.search_no_results)
+                            visibility = View.VISIBLE
+                        }
+                    }
+                } else {
+                    showError(getString(R.string.search_error))
                 }
             } catch (e: Exception) {
-                // Keep showing previous or test events on error
+                hideLoading()
+                showError(getString(R.string.search_no_internet))
             }
         }
+    }
+
+    private fun filterEvents(query: String) {
+        if (query.isEmpty()) {
+            eventAdapter.submitList(allEvents)
+            binding.emptyStateTextView.visibility = if (allEvents.isEmpty()) View.VISIBLE else View.GONE
+            return
+        }
+
+        // Local filtering logic: instantaneous and no network lag
+        val filteredResults = allEvents.filter { 
+            it.title.contains(query, ignoreCase = true) || 
+            it.location.contains(query, ignoreCase = true) 
+        }
+        
+        eventAdapter.submitList(filteredResults)
+        
+        binding.emptyStateTextView.apply {
+            text = getString(R.string.search_no_results)
+            visibility = if (filteredResults.isEmpty()) View.VISIBLE else View.GONE
+        }
+    }
+
+    private fun showLoading() {
+        binding.searchProgressBar.visibility = View.VISIBLE
+        binding.emptyStateTextView.visibility = View.GONE
+    }
+
+    private fun hideLoading() {
+        binding.searchProgressBar.visibility = View.GONE
+    }
+
+    private fun showError(message: String) {
+        binding.emptyStateTextView.apply {
+            text = message
+            visibility = View.VISIBLE
+        }
+        eventAdapter.submitList(emptyList())
     }
 
     override fun onDestroyView() {

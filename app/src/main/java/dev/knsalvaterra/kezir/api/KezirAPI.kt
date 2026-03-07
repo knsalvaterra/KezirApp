@@ -37,9 +37,18 @@ sealed class TicketResult {
 
 data class Event(
     val id: String,
-    val name: String,
-    val date: String,
-    val location: String
+    val title: String,
+    @SerializedName("start_date") val startDate: String,
+    @SerializedName("start_time") val startTime: String,
+    @SerializedName("end_date") val endDate: String,
+    @SerializedName("end_time") val endTime: String,
+    val location: String,
+    @SerializedName("cover_image") val coverImage: String?
+)
+
+data class SearchEventsResponse(
+    val success: Boolean,
+    val events: List<Event>
 )
 
 data class PinRequest(
@@ -118,10 +127,10 @@ interface ApiService {
         @Body request: VerifyRequest
     ): VerifyResponse
 
-    @GET("api/box-office/search-events.php")
+    @GET("api/box-office/events.php")
     suspend fun searchEvents(
         @Query("query") query: String
-    ): Response<List<Event>>
+    ): Response<SearchEventsResponse>
 }
 
 //  Lazy<ApiService> api =  Retrofit.Builder().build().create(ApiService.class)

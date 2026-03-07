@@ -46,6 +46,8 @@
                 android:layout_marginTop="32dp"
                 android:hint="@string/label_eventid"
                 android:textColorHint="#5F5D66"
+                app:helperText="@string/login_search_helper"
+                app:helperTextTextColor="#757575"
                 app:boxCornerRadiusBottomEnd="12dp"
                 app:boxCornerRadiusBottomStart="12dp"
                 app:boxCornerRadiusTopEnd="12dp"

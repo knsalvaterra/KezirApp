@@ -23,8 +23,9 @@ class EventAdapter(private val onEventClick: (Event) -> Unit) :
     inner class EventViewHolder(private val binding: ItemEventBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(event: Event) {
-            binding.eventName.text = event.name
-            binding.eventDate.text = event.date
+            binding.eventName.text = event.title
+            binding.eventDate.text = event.startDate
+            binding.eventTime.text = event.startTime
             binding.eventLocation.text = event.location
             binding.root.setOnClickListener { onEventClick(event) }
         }

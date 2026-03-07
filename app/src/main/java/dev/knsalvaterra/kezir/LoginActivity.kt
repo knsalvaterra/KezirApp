@@ -17,6 +17,9 @@ import kotlinx.coroutines.launch
 class LoginActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityLoginBinding
+    
+    // Toggle this to allow or prevent manual input of Event ID
+    private val allowManualEventIdInput = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -55,12 +58,23 @@ class LoginActivity : AppCompatActivity() {
         binding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        // Configure Event ID input based on the toggle
+        binding.eventIdEditText.apply {
+            isFocusable = allowManualEventIdInput
+            isFocusableInTouchMode = allowManualEventIdInput
+            isClickable = allowManualEventIdInput
+            
+            if (!allowManualEventIdInput) {
+                setOnClickListener {
+                    // Trigger search when clicking the box itself if manual input is disabled
+                    openSearch()
+                }
+            }
+        }
+
         // Set search icon click listener to open the bottom sheet
         binding.eventIdInputLayout.setEndIconOnClickListener {
-            SearchEventBottomSheet { event ->
-                binding.eventIdEditText.setText(event.id)
-                binding.pinEditText.requestFocus()
-            }.show(supportFragmentManager, "search_event")
+            openSearch()
         }
 
         binding.loginButton.setOnClickListener {
@@ -80,6 +94,13 @@ class LoginActivity : AppCompatActivity() {
                 Toast.makeText(this, "Preencha os campos Event ID e PIN", Toast.LENGTH_SHORT).show()
             }
         }
+    }
+
+    private fun openSearch() {
+        SearchEventBottomSheet { event ->
+            binding.eventIdEditText.setText(event.id)
+            binding.pinEditText.requestFocus()
+        }.show(supportFragmentManager, "search_event")
     }
 
     private fun isNetworkAvailable(): Boolean {
