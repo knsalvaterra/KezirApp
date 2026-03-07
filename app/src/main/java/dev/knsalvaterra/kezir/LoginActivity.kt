@@ -33,19 +33,21 @@ class LoginActivity : AppCompatActivity() {
 
 
 
-
+        initializeUI()
         //https://kezir.app/auth?id=684430880843759616&pin=4966 if (intentUri != null && intentUri.path?.contains("login") == true)
         val intentUri = intent?.data
         if (validLink(intentUri)) {
             val linkEventId = intentUri?.getQueryParameter("id")
-            val linkPin = intentUri?.getQueryParameter("pin")
+           // val linkPin = intentUri?.getQueryParameter("pin")
 
-            if (!linkEventId.isNullOrEmpty() && !linkPin.isNullOrEmpty()) {
-               performLogin(linkPin, linkEventId)
+            //if (!linkEventId.isNullOrEmpty() && !linkPin.isNullOrEmpty()) {
+            if (!linkEventId.isNullOrEmpty() ) {
+            //   performLogin(linkPin, linkEventId)
+                binding.eventIdEditText.setText(linkEventId)
                 return
             }
         }
-        initializeUI()
+
     }
 
 
