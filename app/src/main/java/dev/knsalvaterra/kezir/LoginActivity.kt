@@ -21,7 +21,6 @@ class LoginActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         
-        // Auto-login if session exists in memory
         AuthManager.getInMemorySession()?.let { (id, cookie) ->
             openMainScreen(id, cookie)
             return
@@ -29,7 +28,6 @@ class LoginActivity : AppCompatActivity() {
 
         initializeUI()
         
-        // Handle deep links (e.g., kezir.app/auth?id=...)
         val intentUri = intent?.data
         if (validLink(intentUri)) {
             val linkEventId = intentUri?.getQueryParameter("id")
@@ -59,11 +57,10 @@ class LoginActivity : AppCompatActivity() {
 
         // Set search icon click listener to open the bottom sheet
         binding.eventIdInputLayout.setEndIconOnClickListener {
-            val searchSheet = SearchEventBottomSheet { event ->
+            SearchEventBottomSheet { event ->
                 binding.eventIdEditText.setText(event.id)
                 binding.pinEditText.requestFocus()
-            }
-            searchSheet.show(supportFragmentManager, "search_event")
+            }.show(supportFragmentManager, "search_event")
         }
 
         binding.loginButton.setOnClickListener {
@@ -74,7 +71,6 @@ class LoginActivity : AppCompatActivity() {
                 if (isNetworkAvailable()) {
                     performLogin(pin, eventId)
                 } else {
-                    // Try to login with mock session if offline (preserving existing logic)
                     lifecycleScope.launch {
                         val result = AuthManager.login("m836v1d0grchu3mgu5v2e3ne91")
                         handleLoginResult(result)

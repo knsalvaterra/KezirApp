@@ -40,18 +40,37 @@ class SearchEventBottomSheet(private val onEventSelected: (Event) -> Unit) : Bot
         }
         binding.eventsRecyclerView.adapter = eventAdapter
 
+        // Ensure test events are displayed immediately when ready
+        binding.eventsRecyclerView.post {
+            showTestEvents()
+        }
+
         binding.searchEventEditText.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+
+
+            }
             override fun afterTextChanged(s: Editable?) {
                 val query = s.toString().trim()
                 if (query.length >= 3) {
                     searchEvents(query)
-                } else {
-                    eventAdapter.submitList(emptyList())
+                } else if (query.isEmpty()) {
+                    showTestEvents()
                 }
             }
         })
+    }
+
+    private fun showTestEvents() {
+        val testEvents = listOf(
+            Event("664544741697781760", "Evento de Teste 1", "20 Mai 2024", "Lisboa, Portugal"),
+            Event("2", "Concerto de Verão", "15 Jun 2024", "Porto, Portugal"),
+            Event("3", "Conferência Tech", "10 Jul 2024", "S. Tomé"),
+            Event("4", "Festival de Arte", "05 Ago 2024", "Cascais, Portugal"),
+            Event("5", "Maratona Kezir", "12 Set 2024", "Funchal, Madeira")
+        )
+        eventAdapter.submitList(testEvents)
     }
 
     private fun searchEvents(query: String) {
@@ -61,10 +80,11 @@ class SearchEventBottomSheet(private val onEventSelected: (Event) -> Unit) : Bot
             try {
                 val response = ApiClient.api.searchEvents(query)
                 if (response.isSuccessful) {
-                    eventAdapter.submitList(response.body() ?: emptyList())
+                    val results = response.body() ?: emptyList()
+                    eventAdapter.submitList(results)
                 }
             } catch (e: Exception) {
-                // Handle error
+                // Keep showing previous or test events on error
             }
         }
     }

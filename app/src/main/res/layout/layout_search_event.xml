@@ -1,42 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     android:background="@drawable/bottom_sheet_background"
-    android:paddingBottom="24dp">
+    android:orientation="vertical"
+    android:padding="24dp"
+    android:minHeight="500dp">
 
     <View
-        android:id="@+id/dragHandle"
         android:layout_width="40dp"
         android:layout_height="4dp"
-        android:layout_marginTop="12dp"
-        android:background="#E0E0E0"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:layout_gravity="center_horizontal"
+        android:layout_marginBottom="24dp"
+        android:background="#E0E0E0" />
 
     <TextView
         android:id="@+id/titleSearch"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="24dp"
-        android:layout_marginTop="24dp"
         android:text="Procurar Evento"
         android:textColor="#212121"
-        android:textSize="22sp"
-        android:textStyle="bold"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/dragHandle" />
+        android:textSize="24sp"
+        android:textStyle="bold" />
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/searchEventInputLayout"
         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginHorizontal="24dp"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="20dp"
         android:hint="Pesquisar por nome..."
         android:textColorHint="#5F5D66"
         app:boxCornerRadiusBottomEnd="16dp"
@@ -44,12 +38,8 @@
         app:boxCornerRadiusTopEnd="16dp"
         app:boxCornerRadiusTopStart="16dp"
         app:boxStrokeWidth="0dp"
-        app:boxStrokeWidthFocused="0dp"
         app:startIconDrawable="@drawable/ic_search"
-        app:startIconTint="@color/chill_green"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/titleSearch">
+        app:startIconTint="@color/on_surface">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/searchEventEditText"
@@ -64,16 +54,13 @@
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/eventsRecyclerView"
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_marginTop="16dp"
+        android:layout_weight="1"
         android:clipToPadding="false"
-        android:paddingHorizontal="12dp"
+        android:paddingBottom="16dp"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/searchEventInputLayout"
         tools:listitem="@layout/item_event" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+</LinearLayout>
