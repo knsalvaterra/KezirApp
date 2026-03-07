@@ -6,38 +6,36 @@
     android:layout_height="wrap_content"
     android:background="@drawable/bottom_sheet_background"
     android:orientation="vertical"
-    android:paddingHorizontal="12dp"
+    android:paddingHorizontal="16dp"
     android:paddingBottom="32dp">
 
-    <!-- Draggable handle for modern feel -->
+    <!-- Draggable handle -->
     <View
         android:id="@+id/dragHandle"
         android:layout_width="48dp"
         android:layout_height="5dp"
         android:layout_marginTop="12dp"
         android:layout_gravity="center_horizontal"
-        android:background="#D1D1D1"
-        android:backgroundTint="#D1D1D1" />
+        android:background="@drawable/drag_handle_rounded" />
 
     <TextView
         android:id="@+id/titleSearch"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="12dp"
+        android:layout_marginStart="8dp"
         android:layout_marginTop="24dp"
         android:text="@string/search_event_title"
         android:textColor="#212121"
         android:textSize="26sp"
         android:textStyle="bold" />
 
-    <!-- Search box consistent with Login fields -->
+    <!-- Search box: Wider and perfectly consistent -->
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/searchEventInputLayout"
         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="24dp"
-        android:layout_marginHorizontal="4dp"
         android:hint="@string/search_event_hint"
         android:textColorHint="#5F5D66"
         app:hintTextColor="#5F5D66"
@@ -64,11 +62,11 @@
 
     </com.google.android.material.textfield.TextInputLayout>
 
-    <!-- Content area: wrap_content with NO minHeight to avoid empty space -->
+    <!-- Content area: wrap_content with NO minHeight to collapse when empty -->
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp">
+        android:layout_marginTop="12dp">
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/eventsRecyclerView"
@@ -77,6 +75,8 @@
             android:clipToPadding="false"
             android:paddingBottom="8dp"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            app:layout_constrainedHeight="true"
+            app:layout_constraintHeight_max="400dp"
             tools:listitem="@layout/item_event" />
 
         <ProgressBar

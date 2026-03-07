@@ -3,7 +3,6 @@ package dev.knsalvaterra.kezir
 import android.content.Context
 import android.content.Intent
 import android.net.ConnectivityManager
-import android.net.NetworkCapabilities
 import android.net.Uri
 import android.os.Bundle
 import android.widget.Toast
@@ -30,6 +29,9 @@ class LoginActivity : AppCompatActivity() {
         }
 
         initializeUI()
+        
+        // Start pre-loading events as soon as the app opens to make searching instantaneous
+        SearchEventBottomSheet.preloadEvents()
         
         val intentUri = intent?.data
         if (validLink(intentUri)) {
@@ -66,7 +68,6 @@ class LoginActivity : AppCompatActivity() {
             
             if (!allowManualEventIdInput) {
                 setOnClickListener {
-                    // Trigger search when clicking the box itself if manual input is disabled
                     openSearch()
                 }
             }
@@ -109,8 +110,8 @@ class LoginActivity : AppCompatActivity() {
         val activeNetwork = connectivityManager.getNetworkCapabilities(network) ?: return false
 
         return when {
-            activeNetwork.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) -> true
-            activeNetwork.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) -> true
+            activeNetwork.hasTransport(android.net.NetworkCapabilities.TRANSPORT_WIFI) -> true
+            activeNetwork.hasTransport(android.net.NetworkCapabilities.TRANSPORT_CELLULAR) -> true
             else -> false
         }
     }

@@ -11,6 +11,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import dev.knsalvaterra.kezir.api.ApiClient
 import dev.knsalvaterra.kezir.api.Event
 import dev.knsalvaterra.kezir.databinding.LayoutSearchEventBinding
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class SearchEventBottomSheet(private val onEventSelected: (Event) -> Unit) : BottomSheetDialogFragment() {
@@ -18,7 +19,6 @@ class SearchEventBottomSheet(private val onEventSelected: (Event) -> Unit) : Bot
     private var _binding: LayoutSearchEventBinding? = null
     private val binding get() = _binding!!
     private lateinit var eventAdapter: EventAdapter
-    private var allEvents: List<Event> = emptyList()
 
     override fun getTheme(): Int = R.style.CustomBottomSheetDialogTheme
 
@@ -37,8 +37,12 @@ class SearchEventBottomSheet(private val onEventSelected: (Event) -> Unit) : Bot
         setupRecyclerView()
         setupSearchLogic()
         
-        // Automatically load all available events on startup
-        fetchAllEvents()
+        // Use pre-loaded data or fetch if not available
+        if (preloadedEvents.isNotEmpty()) {
+            displayEvents(preloadedEvents)
+        } else {//prolly not necessary unless by some unknown rrwson fetching from login didnt work
+            fetchAllEvents()
+        }
     }
 
     private fun setupRecyclerView() {
@@ -48,7 +52,7 @@ class SearchEventBottomSheet(private val onEventSelected: (Event) -> Unit) : Bot
         }
         binding.eventsRecyclerView.apply {
             adapter = eventAdapter
-            itemAnimator = null 
+            itemAnimator = null
         }
     }
 
@@ -57,7 +61,7 @@ class SearchEventBottomSheet(private val onEventSelected: (Event) -> Unit) : Bot
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
             override fun afterTextChanged(s: Editable?) {
-                filterEvents(s.toString().trim())
+                applyLocalFilter(s.toString().trim())
             }
         })
     }
@@ -66,20 +70,12 @@ class SearchEventBottomSheet(private val onEventSelected: (Event) -> Unit) : Bot
         showLoading()
         lifecycleScope.launch {
             try {
-                // Fetching all events (passing empty query to the API)
                 val response = ApiClient.api.searchEvents("")
                 hideLoading()
-                
+
                 if (response.isSuccessful) {
-                    allEvents = response.body()?.events ?: emptyList()
-                    eventAdapter.submitList(allEvents)
-                    
-                    if (allEvents.isEmpty()) {
-                        binding.emptyStateTextView.apply {
-                            text = getString(R.string.search_no_results)
-                            visibility = View.VISIBLE
-                        }
-                    }
+                    preloadedEvents = response.body()?.events ?: emptyList()
+                    displayEvents(preloadedEvents)
                 } else {
                     showError(getString(R.string.search_error))
                 }
@@ -90,24 +86,29 @@ class SearchEventBottomSheet(private val onEventSelected: (Event) -> Unit) : Bot
         }
     }
 
-    private fun filterEvents(query: String) {
+    private fun applyLocalFilter(query: String) {
         if (query.isEmpty()) {
-            eventAdapter.submitList(allEvents)
-            binding.emptyStateTextView.visibility = if (allEvents.isEmpty()) View.VISIBLE else View.GONE
+            displayEvents(preloadedEvents) //show all availabnle events
             return
         }
 
-        // Local filtering logic: instantaneous and no network lag
-        val filteredResults = allEvents.filter { 
-            it.title.contains(query, ignoreCase = true) || 
+        val filteredResults = preloadedEvents.filter { 
+            it.title.contains(query, ignoreCase = true) ||  //search by name or loc name
             it.location.contains(query, ignoreCase = true) 
         }
         
-        eventAdapter.submitList(filteredResults)
-        
-        binding.emptyStateTextView.apply {
-            text = getString(R.string.search_no_results)
-            visibility = if (filteredResults.isEmpty()) View.VISIBLE else View.GONE
+        displayEvents(filteredResults)
+    }
+
+    private fun displayEvents(events: List<Event>) {
+        eventAdapter.submitList(events)
+        updateEmptyState(events.isEmpty())
+    }
+
+    private fun updateEmptyState(isEmpty: Boolean) {
+        binding.emptyStateTextView.visibility = if (isEmpty) View.VISIBLE else View.GONE
+        if (isEmpty) {
+            binding.emptyStateTextView.text = getString(R.string.search_no_results)
         }
     }
 
@@ -121,15 +122,34 @@ class SearchEventBottomSheet(private val onEventSelected: (Event) -> Unit) : Bot
     }
 
     private fun showError(message: String) {
-        binding.emptyStateTextView.apply {
-            text = message
-            visibility = View.VISIBLE
-        }
+        binding.emptyStateTextView.text = message
+        binding.emptyStateTextView.visibility = View.VISIBLE
         eventAdapter.submitList(emptyList())
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    companion object {
+        private var preloadedEvents: List<Event> = emptyList()
+
+        /**
+         * Pre-fetches all events from the API.
+         */
+        fun preloadEvents() {
+            @Suppress("OPT_IN_USAGE")
+            kotlinx.coroutines.GlobalScope.launch(Dispatchers.IO) {
+                try {
+                    val response = ApiClient.api.searchEvents("")
+                    if (response.isSuccessful) {
+                        preloadedEvents = response.body()?.events ?: emptyList()
+                    }
+                } catch (e: Exception) {
+                    // Fail silently
+                }
+            }
+        }
     }
 }
