@@ -74,11 +74,8 @@ class MainActivity : AppCompatActivity() {
     private var eventId: String? = null
     private var currentSessionCookie: String? = null
     private var shouldScan: Boolean = false
-    
-    
     private var isScanning: Boolean = false
-    
-    
+
     private val scanDuration = 850L
 
 

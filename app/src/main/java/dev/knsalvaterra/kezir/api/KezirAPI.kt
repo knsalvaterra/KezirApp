@@ -14,8 +14,10 @@ import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.Body
+import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.POST
+import retrofit2.http.Query
 
 
 @Suppress("all")
@@ -33,6 +35,12 @@ sealed class TicketResult {
     ) : TicketResult()
 }
 
+data class Event(
+    val id: String,
+    val name: String,
+    val date: String,
+    val location: String
+)
 
 data class PinRequest(
     val pin: String,
@@ -109,6 +117,11 @@ interface ApiService {
         @Header("Cookie") sessionCookie: String,
         @Body request: VerifyRequest
     ): VerifyResponse
+
+    @GET("api/box-office/search-events.php")
+    suspend fun searchEvents(
+        @Query("query") query: String
+    ): Response<List<Event>>
 }
 
 //  Lazy<ApiService> api =  Retrofit.Builder().build().create(ApiService.class)

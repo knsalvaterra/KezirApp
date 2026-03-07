@@ -18,12 +18,11 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:strokeWidth="0dp"
-        >
+        app:strokeWidth="0dp">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:padding="24dp">
 
             <TextView
@@ -32,18 +31,12 @@
                 android:layout_height="wrap_content"
                 android:text="Kezir"
                 android:textColor="#212121"
-
                 android:textSize="34sp"
                 android:textStyle="bold"
                 android:maxLines="1"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
-
-
-
-
-
 
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/eventIdInputLayout"
@@ -58,6 +51,10 @@
                 app:boxCornerRadiusTopEnd="12dp"
                 app:boxCornerRadiusTopStart="12dp"
                 app:boxStrokeWidth="0dp"
+                app:endIconMode="custom"
+                app:endIconDrawable="@drawable/ic_search"
+                app:endIconTint="@color/chill_green"
+                app:endIconContentDescription="Procurar Evento"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/titleTextView">
@@ -66,12 +63,10 @@
                     android:id="@+id/eventIdEditText"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-
                     android:background="@drawable/input_bg_rounded"
                     android:textColor="#282828"
-                    app:hintTextColor="#5F5D66"
-                    android:maxLines="1"
-                    />
+                    android:paddingEnd="48dp"
+                    android:maxLines="1" />
 
             </com.google.android.material.textfield.TextInputLayout>
 
@@ -82,8 +77,6 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
                 android:hint="@string/label_pin"
-                android:textColor="#49454F"
-                app:hintTextColor="#5F5D66"
                 android:textColorHint="#5F5D66"
                 app:boxCornerRadiusBottomEnd="12dp"
                 app:boxCornerRadiusBottomStart="12dp"
@@ -94,7 +87,6 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/eventIdInputLayout">
 
-
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/pinEditText"
                     android:layout_width="match_parent"
@@ -102,12 +94,9 @@
                     android:inputType="numberPassword"
                     android:background="@drawable/input_bg_rounded"
                     android:textColor="#282828"
-                    android:maxLines="1"
-                    />
+                    android:maxLines="1" />
 
             </com.google.android.material.textfield.TextInputLayout>
-
-
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/loginButton"
@@ -115,18 +104,14 @@
                 android:layout_width="0dp"
                 android:layout_height="56dp"
                 android:layout_marginTop="24dp"
-
                 android:text="@string/label_button_login"
-                app:backgroundTint="@color/button_tint_selector"
+                app:backgroundTint="@color/chill_green"
                 android:textColor="#FFFFFF"
                 app:cornerRadius="16dp"
-
                 android:textSize="18sp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/pinInputLayout" />
-
-
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
