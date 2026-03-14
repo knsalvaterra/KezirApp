@@ -154,9 +154,6 @@ class MainActivity : AppCompatActivity() {
                 }
             } else if (validCodeFormat(code)) {
                 verifyCode(code)
-                runOnUiThread {
-                    vibrate(VIBRATION_SUCCESS_PATTERN)
-                }
             }
         }
 
@@ -166,7 +163,6 @@ class MainActivity : AppCompatActivity() {
         }
 
         binding.logoutButton.setOnClickListener {
-            // Use the fancy LogoutBottomSheet instead of a standard alert
             LogoutBottomSheet().show(supportFragmentManager, "logout_sheet")
         }
 
@@ -338,10 +334,6 @@ class MainActivity : AppCompatActivity() {
     private fun handleScannedBarcode(barcode: Barcode) {
         val code = barcode.rawValue ?: return
 
-        if (binding.manualInput.text.toString() == code && lastInvalidCode == code) {
-            return
-        }
-
         if (binding.manualInput.text.toString().isNotEmpty() ) {
             return
         }
@@ -350,10 +342,8 @@ class MainActivity : AppCompatActivity() {
             lastInvalidCode = null
             runOnUiThread {
                 binding.manualInput.setText(code)
-                vibrate(VIBRATION_SUCCESS_PATTERN)
             }
             verifyCode(code)
-            Toast.makeText(this, getString(R.string.ticket_code_is) + " " + code, Toast.LENGTH_SHORT).show()
         } else {
             val now = System.currentTimeMillis()
             if (lastInvalidCode != code || now - lastInvalidScanTime > 3000) {
@@ -368,7 +358,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun validCodeFormat(code: String): Boolean {
-        return code.isNotEmpty() && code.all { it.isDigit() }
+        // Tickets should rely on backend for validity. Client only checks if not empty.
+        return code.isNotBlank()
     }
 
     private fun verifyCode(code: String) {
@@ -388,6 +379,13 @@ class MainActivity : AppCompatActivity() {
             binding.manualInput.text?.clear()
             updateButtonState()
         }
+
+        if (result is TicketResult.Success) {
+            vibrate(VIBRATION_SUCCESS_PATTERN)
+        } else {
+            vibrate(VIBRATION_FAILURE_PATTERN)
+        }
+
         val sheet = when (result) {
             is TicketResult.Success -> TicketViewBottomSheet(
                 success = true,
@@ -398,7 +396,7 @@ class MainActivity : AppCompatActivity() {
             is TicketResult.Error -> TicketViewBottomSheet(
                 success = false,
                 message = result.message,
-                order = null,
+                order = result.order,
                 onDismissed = onDismissed,
             )
         }

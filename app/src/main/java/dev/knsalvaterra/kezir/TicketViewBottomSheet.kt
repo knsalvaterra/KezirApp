@@ -211,14 +211,40 @@ class TicketViewBottomSheet(
 
         statusSubtitle.visibility = View.GONE
 
-        buyerName.text = getString(R.string.not_available)
+        if (order != null) {
+            buyerNameLabel.visibility = View.VISIBLE
+            buyerLabelIcon.visibility = View.VISIBLE
+            buyerName.visibility = View.VISIBLE
+            buyerName.text = order?.buyer_name
 
-        buyerPhoneLabel.visibility = View.GONE
-        buyerPhoneIcon.visibility = View.GONE
-        buyerPhone.visibility = View.GONE
+            buyerPhoneLabel.visibility = View.VISIBLE
+            buyerPhoneIcon.visibility = View.VISIBLE
+            buyerPhone.visibility = View.VISIBLE
+            buyerPhone.text = censorPhoneNumber(order?.buyer_phone ?: "")
 
-        ticketsLabel.visibility = View.GONE
-        ticketDetailsContainer.visibility = View.GONE
+            ticketsLabel.visibility = View.VISIBLE
+            ticketDetailsContainer.visibility = View.GONE
+            ticketDetailsContainer.removeAllViews()
+            order?.tickets?.forEach { ticket ->
+                val inflater = LayoutInflater.from(requireContext())
+                val detailItem = inflater.inflate(R.layout.ticket_detail_item, ticketDetailsContainer, false)
+                detailItem.findViewById<TextView>(R.id.ticket_name).text = ticket.ticket_name
+                detailItem.findViewById<TextView>(R.id.ticket_quantity).text = "x${ticket.quantity}"
+                ticketDetailsContainer.addView(detailItem)
+            }
+        } else {
+            buyerNameLabel.visibility = View.VISIBLE
+            buyerLabelIcon.visibility = View.VISIBLE
+            buyerName.visibility = View.VISIBLE
+            buyerName.text = getString(R.string.not_available)
+
+            buyerPhoneLabel.visibility = View.GONE
+            buyerPhoneIcon.visibility = View.GONE
+            buyerPhone.visibility = View.GONE
+
+            ticketsLabel.visibility = View.GONE
+            ticketDetailsContainer.visibility = View.GONE
+        }
 
         infoMessageContainer.visibility = View.VISIBLE
         infoMessageContainer.setBackgroundResource(R.drawable.info_message_background_invalid)

@@ -10,11 +10,10 @@ import android.graphics.PorterDuffXfermode
 import android.graphics.RectF
 import android.util.AttributeSet
 import android.view.View
+import androidx.core.content.ContextCompat
 import dev.knsalvaterra.kezir.R
 import kotlin.math.min
 
-
-//Androidx UI Library
 class ScannerOverlayView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
@@ -22,7 +21,7 @@ class ScannerOverlayView @JvmOverloads constructor(
 ) : View(context, attrs, defStyleAttr) {
 
     private val backgroundPaint = Paint().apply {
-        color = Color.argb(128, 0, 0, 0) // Semi-transparent black
+        color = Color.argb(160, 0, 0, 0) // Slightly darker for better focus
     }
 
     private val clearPaint = Paint().apply {
@@ -43,12 +42,12 @@ class ScannerOverlayView @JvmOverloads constructor(
             attrs, R.styleable.ScannerOverlayView, defStyleAttr, 0
         )
 
-        val borderColor = typedArray.getColor(R.styleable.ScannerOverlayView_overlay_borderColor, Color.WHITE)
-        val borderWidth = typedArray.getDimension(R.styleable.ScannerOverlayView_overlay_borderWidth, 10f)
-        cornerRadius = typedArray.getDimension(R.styleable.ScannerOverlayView_overlay_cornerRadius, 40f)
-        cornerLengthRatio = typedArray.getFloat(R.styleable.ScannerOverlayView_overlay_cornerLengthRatio, 0.1f)
-        sizePercentage = typedArray.getFloat(R.styleable.ScannerOverlayView_overlay_sizePercentage, 0.8f)
-        verticalBias = typedArray.getFloat(R.styleable.ScannerOverlayView_overlay_verticalBias, 0.5f)
+        val borderColor = typedArray.getColor(R.styleable.ScannerOverlayView_overlay_borderColor, ContextCompat.getColor(context, R.color.chill_green))
+        val borderWidth = typedArray.getDimension(R.styleable.ScannerOverlayView_overlay_borderWidth, 8f)
+        cornerRadius = typedArray.getDimension(R.styleable.ScannerOverlayView_overlay_cornerRadius, 60f)
+        cornerLengthRatio = typedArray.getFloat(R.styleable.ScannerOverlayView_overlay_cornerLengthRatio, 0.15f)
+        sizePercentage = typedArray.getFloat(R.styleable.ScannerOverlayView_overlay_sizePercentage, 0.65f)
+        verticalBias = typedArray.getFloat(R.styleable.ScannerOverlayView_overlay_verticalBias, 0.45f)
 
         typedArray.recycle()
 
@@ -56,6 +55,7 @@ class ScannerOverlayView @JvmOverloads constructor(
             color = borderColor
             style = Paint.Style.STROKE
             strokeWidth = borderWidth
+            strokeCap = Paint.Cap.ROUND
             isAntiAlias = true
         }
     }
@@ -67,17 +67,9 @@ class ScannerOverlayView @JvmOverloads constructor(
         }
         updatePath()
     }
-    fun getRectangle(): RectF {
-        return transparentRect
-    }
 
-    fun sizePercentage() : Float {
-        return sizePercentage
-    }
-
-    fun verticalBias(): Float {
-        return verticalBias;
-    }
+    fun sizePercentage(): Float = sizePercentage
+    fun verticalBias(): Float = verticalBias
 
     fun setTransparentRectangle(rect: RectF) {
         isRectManuallySet = true
@@ -91,77 +83,48 @@ class ScannerOverlayView @JvmOverloads constructor(
         val height = viewHeight.toFloat()
         val rectSize = min(width, height) * sizePercentage
         val left = (width - rectSize) / 2
-        val top = (height - rectSize)* verticalBias
+        val top = (height - rectSize) * verticalBias
         val right = left + rectSize
-        val bottom = (top + rectSize)
+        val bottom = top + rectSize
         transparentRect.set(left, top, right, bottom)
     }
 
     private fun updatePath() {
         path.reset()
-        if (transparentRect.isEmpty) {
-            return
-        }
+        if (transparentRect.isEmpty) return
 
         val cornerLength = transparentRect.width() * cornerLengthRatio
 
-        // Top-left corner
+        // Top-left
         path.moveTo(transparentRect.left, transparentRect.top + cornerLength)
         path.lineTo(transparentRect.left, transparentRect.top + cornerRadius)
-        path.arcTo(
-            RectF(
-                transparentRect.left,
-                transparentRect.top,
-                transparentRect.left + 2 * cornerRadius,
-                transparentRect.top + 2 * cornerRadius
-            ), 180f, 90f, false)
+        path.quadTo(transparentRect.left, transparentRect.top, transparentRect.left + cornerRadius, transparentRect.top)
         path.lineTo(transparentRect.left + cornerLength, transparentRect.top)
 
-        // Top-right corner
+        // Top-right
         path.moveTo(transparentRect.right - cornerLength, transparentRect.top)
         path.lineTo(transparentRect.right - cornerRadius, transparentRect.top)
-        path.arcTo(
-            RectF(
-                transparentRect.right - 2 * cornerRadius,
-                transparentRect.top,
-                transparentRect.right,
-                transparentRect.top + 2 * cornerRadius
-            ), 270f, 90f, false)
+        path.quadTo(transparentRect.right, transparentRect.top, transparentRect.right, transparentRect.top + cornerRadius)
         path.lineTo(transparentRect.right, transparentRect.top + cornerLength)
 
-        // Bottom-left corner
-        path.moveTo(transparentRect.left + cornerLength, transparentRect.bottom)
-        path.lineTo(transparentRect.left + cornerRadius, transparentRect.bottom)
-        path.arcTo(
-            RectF(
-                transparentRect.left,
-                transparentRect.bottom - 2 * cornerRadius,
-                transparentRect.left + 2 * cornerRadius,
-                transparentRect.bottom
-            ), 90f, 90f, false)
-        path.lineTo(transparentRect.left, transparentRect.bottom - cornerLength)
+        // Bottom-left
+        path.moveTo(transparentRect.left, transparentRect.bottom - cornerLength)
+        path.lineTo(transparentRect.left, transparentRect.bottom - cornerRadius)
+        path.quadTo(transparentRect.left, transparentRect.bottom, transparentRect.left + cornerRadius, transparentRect.bottom)
+        path.lineTo(transparentRect.left + cornerLength, transparentRect.bottom)
 
-        // Bottom-right corner
-        path.moveTo(transparentRect.right, transparentRect.bottom - cornerLength)
-        path.lineTo(transparentRect.right, transparentRect.bottom - cornerRadius)
-        path.arcTo(
-            RectF(
-                transparentRect.right - 2 * cornerRadius,
-                transparentRect.bottom - 2 * cornerRadius,
-                transparentRect.right,
-                transparentRect.bottom
-            ), 0f, 90f, false)
-        path.lineTo(transparentRect.right - cornerLength, transparentRect.bottom)
+        // Bottom-right
+        path.moveTo(transparentRect.right - cornerLength, transparentRect.bottom)
+        path.lineTo(transparentRect.right - cornerRadius, transparentRect.bottom)
+        path.quadTo(transparentRect.right, transparentRect.bottom, transparentRect.right, transparentRect.bottom - cornerRadius)
+        path.lineTo(transparentRect.right, transparentRect.bottom - cornerLength)
     }
 
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
-        // semi-transparent background
         canvas.drawRect(0f, 0f, width.toFloat(), height.toFloat(), backgroundPaint)
-
-        // transparent rectangle in the center and the border
         if (!transparentRect.isEmpty) {
-            canvas.drawRoundRect(transparentRect, cornerRadius, cornerRadius ,clearPaint)
+            canvas.drawRoundRect(transparentRect, cornerRadius, cornerRadius, clearPaint)
             canvas.drawPath(path, borderPaint)
         }
     }

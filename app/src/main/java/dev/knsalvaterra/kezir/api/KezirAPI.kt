@@ -5,7 +5,9 @@ import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.util.Log
+import com.google.gson.Gson
 import com.google.gson.annotations.SerializedName
+import dev.knsalvaterra.kezir.R
 import dev.knsalvaterra.kezir.data.AppDatabase
 import dev.knsalvaterra.kezir.data.StoredTicket
 import kotlinx.coroutines.Dispatchers
@@ -23,7 +25,6 @@ import retrofit2.http.Query
 @Suppress("all")
 sealed class TicketResult {
 
-
     data class Success(
         val message: String,
         val order: Order?
@@ -31,7 +32,8 @@ sealed class TicketResult {
 
 
     data class Error(
-        val message: String
+        val message: String,
+        val order: Order? = null
     ) : TicketResult()
 }
 
@@ -77,8 +79,6 @@ data class VerifyResponse(
 )
 
 /*
-
-
  {
     "success": true,
     "message": "Código verificado e marcado como resgatado!",
@@ -97,7 +97,6 @@ data class VerifyResponse(
  }
 */
 
-
 data class Order(
     val buyer_name: String,
     val buyer_phone: String,
@@ -111,8 +110,6 @@ data class Ticket(
     val quantity: String
 )
 
-
-
 interface ApiService {
 
     @POST("api/box-office/verify-pin.php")
@@ -125,7 +122,7 @@ interface ApiService {
     suspend fun verifyCode(
         @Header("Cookie") sessionCookie: String,
         @Body request: VerifyRequest
-    ): VerifyResponse
+    ): Response<VerifyResponse>
 
     @GET("api/box-office/events.php")
     suspend fun searchEvents(
@@ -146,7 +143,7 @@ object ApiClient {
     }
 }
 
-// ticket relatd
+// ticket related
 
 object TicketManager {
 
@@ -183,11 +180,11 @@ object TicketManager {
                 )
             )
             TicketResult.Success(
-                "Código verificado offline!",
+                context.getString(R.string.ticket_verified_offline),
                 mockOrder
             )
         } else {
-            TicketResult.Error("Código de bilhete offline inválido")
+            TicketResult.Error(context.getString(R.string.ticket_error_offline_invalid))
         }
     }
 
@@ -199,9 +196,12 @@ object TicketManager {
         eventId: String?
     ): TicketResult {
         if (eventId == null) {
-            return TicketResult.Error("Event ID is missing.")
+            return TicketResult.Error(context.getString(R.string.ticket_error_no_id))
         }
 
+        if (!isNetworkAvailable(context)) {
+            return TicketResult.Error(context.getString(R.string.login_failed_check_connection))
+        }
 
         return try {
             val response = ApiClient.api.verifyCode(
@@ -209,34 +209,49 @@ object TicketManager {
                 VerifyRequest(code, eventId)
             )
 
-            if (response.success) {
-            //    val ticketDao = AppDatabase.getDatabase(context).ticketDao()
-            //    val storedTicket = StoredTicket(
-            //        code = code,
-            //        buyerName = response.order.buyer_name,
-            //        buyerPhone = response.order.buyer_phone,
-            //        ticketType = response.order.tickets.first().ticket_type,
-            //        ticketName = response.order.tickets.first().ticket_name,
-            //        tableCapacity = response.order.tickets.first().table_capacity,
-            //        quantity = response.order.tickets.first().quantity,
-            //        eventId = eventId
-            //    )
-            //    withContext(Dispatchers.IO) {
-            //        ticketDao.insertTicket(storedTicket)
-            //    }
+            if (response.isSuccessful) {
+                val body = response.body()
+                if (body != null && body.success) {
 
-                return TicketResult.Success(
-                    response.message ?: "Success",
-                    response.order
-                )
+
+                    TicketResult.Success(
+                        body.message ?: context.getString(R.string.status_subtitle_success),
+                        body.order
+                    )
+                } else {
+                    // Backend reported ticket is invalid or already used (explicitly use server message)
+                    TicketResult.Error(
+                        message = body?.message ?: context.getString(R.string.ticket_error_default),
+                        order = body?.order
+                    )
+                }
             } else {
-                return TicketResult.Error(response.message ?: "Invalid ticket.")
+                // Non-200 responses (e.g. 401 Session Expired)
+                val errorBody = response.errorBody()?.string()
+                val parsedError = try { Gson().fromJson(errorBody, VerifyResponse::class.java) } catch (e: Exception) { null }
+
+                val message = when {
+                    parsedError?.message != null -> parsedError.message
+                    response.code() == 401 -> context.getString(R.string.session_invalid)
+                    else -> context.getString(R.string.ticket_error_default)
+                }
+                
+                TicketResult.Error(
+                    message = message,
+                    order = parsedError?.order
+                )
             }
         } catch (e: Exception) {
             Log.e("TicketManager", "Verification request failed", e)
             //   TicketResult.Error("Verification failed. Check network connection")
-            TicketResult.Error("Código de bilhete não encontrado ou já foi utilizado.")
-    }
+            
+            val errorMessage = if (!isNetworkAvailable(context)) {
+                context.getString(R.string.login_failed_check_connection)
+            } else {
+                "Erro de comunicação com o servidor. Tente novamente."
+            }
+            TicketResult.Error(errorMessage)
+        }
     }
 
     private suspend fun cacheTicketLocally(context: Context, code: String, eventId: String, order: Order) {
