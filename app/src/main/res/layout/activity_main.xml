@@ -26,8 +26,8 @@
         app:overlay_borderWidth="8dp"
         app:overlay_cornerLengthRatio="0.1"
         app:overlay_cornerRadius="16dp"
-        app:overlay_sizePercentage="0.55"
-        app:overlay_verticalBias="0.45" />
+        app:overlay_sizePercentage="0.70"
+        app:overlay_verticalBias="0.5" />
 
     <View
         android:layout_width="match_parent"

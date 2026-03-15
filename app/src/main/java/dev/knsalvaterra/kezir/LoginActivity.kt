@@ -23,8 +23,8 @@ class LoginActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         
-        AuthManager.getInMemorySession()?.let { (id, cookie) ->
-            openMainScreen(id, cookie)
+        AuthManager.getInMemorySession()?.let { (id, pin) ->
+            openMainScreen(id, pin)
             return
         }
 
@@ -87,12 +87,12 @@ class LoginActivity : AppCompatActivity() {
             if (eventId.isNotBlank() && pin.isNotBlank()) {
                 if (isNetworkAvailable()) {
                     performLogin(pin, eventId)
-                } else {
-                    lifecycleScope.launch {
-                        val result = AuthManager.login("m836v1d0grchu3mgu5v2e3ne91")
-                        handleLoginResult(result)
-                    }
-                }
+                } //else {
+                  //  lifecycleScope.launch {
+                  //      val result = AuthManager.login("m836v1d0grchu3mgu5v2e3ne91")
+                  //      handleLoginResult(result)
+                  //  }
+                //}
             } else {
                 Toast.makeText(this, getString(R.string.login_fill_fields), Toast.LENGTH_SHORT).show()
             }
@@ -119,10 +119,10 @@ class LoginActivity : AppCompatActivity() {
         }
     }
 
-    private fun openMainScreen(eventId: String, sessionCookie: String) {
+    private fun openMainScreen(eventId: String, pin: String) {
         val intent = Intent(this, MainActivity::class.java).apply {
             putExtra("EVENT_ID", eventId)
-            putExtra("SESSION_COOKIE", sessionCookie)
+            putExtra("USER_PIN", pin)
         }
         startActivity(intent)
         finish()
@@ -131,8 +131,8 @@ class LoginActivity : AppCompatActivity() {
     private fun handleLoginResult(result: LoginResult) {
         when (result) {
             is LoginResult.Success -> {
-                AuthManager.saveSessionInMemory(result.eventId, result.sessionCookie)
-                openMainScreen(result.eventId, result.sessionCookie)
+                AuthManager.saveSessionInMemory(result.eventId, result.pin)
+                openMainScreen(result.eventId, result.pin)
             }
             is LoginResult.Error -> {
                 Toast.makeText(this, result.message, Toast.LENGTH_LONG).show()

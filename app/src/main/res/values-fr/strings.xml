@@ -17,7 +17,7 @@
     <string name="label_buyer_phone">Numéro de téléphone</string>
     <string name="button_label_continue">CONTINUER</string>
     <string name="session_cookie_not_found">Cookie de session introuvable dans la réponse.</string>
-    <string name="invalid_pin_or_event_id">PIN ou identifiant d\'événement invalide.</string>
+    <string name="invalid_pin_or_event_id">PIN d\'événement invalide.</string>
     <string name="auth_manager_log_tag">AuthManager</string>
     <string name="login_request_failed">Échec de la demande de connexion</string>
     <string name="login_failed_check_connection">Échec de la connexion. Veuillez vérifier votre connexion internet.</string>

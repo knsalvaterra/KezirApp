@@ -69,7 +69,7 @@ class MainActivity : AppCompatActivity() {
     private var isFlashOn = false
 
     private var eventId: String? = null
-    private var currentSessionCookie: String? = null
+    private var userPin: String? = null
     private var shouldScan: Boolean = false
     private var isScanning: Boolean = false
 
@@ -121,7 +121,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         eventId = intent.getStringExtra("EVENT_ID")
-        currentSessionCookie = intent.getStringExtra("SESSION_COOKIE")
+        userPin = intent.getStringExtra("USER_PIN")
 
         if (!isValidSession()) {
             Toast.makeText(this, getString(R.string.session_invalid), Toast.LENGTH_LONG).show()
@@ -205,6 +205,7 @@ class MainActivity : AppCompatActivity() {
             binding.scanButton.text = getString(R.string.label_button_scan)
             binding.scanButton.isEnabled = true
         } else {
+
             binding.scanButton.text = getString(R.string.label_button_verify)
             binding.scanButton.isEnabled = validCodeFormat(code)
         }
@@ -358,18 +359,18 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun validCodeFormat(code: String): Boolean {
-        // Tickets should rely on backend for validity. Client only checks if not empty.
+
         return code.isNotBlank()
     }
 
     private fun verifyCode(code: String) {
-        val cookie = currentSessionCookie ?: run {
+        val pin = userPin ?: run {
             Toast.makeText(this, getString(R.string.unauthenticated), Toast.LENGTH_LONG).show()
             return
         }
 
         lifecycleScope.launch {
-            val result = TicketManager.evaluateTicket(this@MainActivity, cookie, code, eventId)
+            val result = TicketManager.evaluateTicket(this@MainActivity, pin, code, eventId)
             showTicketResult(result)
         }
     }
@@ -404,7 +405,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun isValidSession(): Boolean {
-        return currentSessionCookie != null && eventId != null
+        return userPin != null && eventId != null
     }
 
     override fun onDestroy() {

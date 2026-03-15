@@ -17,7 +17,6 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.Body
 import retrofit2.http.GET
-import retrofit2.http.Header
 import retrofit2.http.POST
 import retrofit2.http.Query
 
@@ -66,8 +65,9 @@ data class PinResponse(
 
 
 data class VerifyRequest(
+    val event_id: String,
     val code: String,
-    val event_id: String
+    val pin: String
 )
 
 
@@ -120,7 +120,6 @@ interface ApiService {
 
     @POST("api/box-office/verify-code.php")
     suspend fun verifyCode(
-        @Header("Cookie") sessionCookie: String,
         @Body request: VerifyRequest
     ): Response<VerifyResponse>
 
@@ -191,7 +190,7 @@ object TicketManager {
     @SuppressLint("SuspiciousIndentation")
     suspend fun evaluateTicket(
         context: Context,
-        sessionCookie: String,
+        pin: String,
         code: String,
         eventId: String?
     ): TicketResult {
@@ -205,8 +204,7 @@ object TicketManager {
 
         return try {
             val response = ApiClient.api.verifyCode(
-                sessionCookie,
-                VerifyRequest(code, eventId)
+                VerifyRequest(eventId, code, pin)
             )
 
             if (response.isSuccessful) {
@@ -219,20 +217,18 @@ object TicketManager {
                         body.order
                     )
                 } else {
-                    // Backend reported ticket is invalid or already used (explicitly use server message)
+                    // backend given ticket is invalid or already used
                     TicketResult.Error(
                         message = body?.message ?: context.getString(R.string.ticket_error_default),
                         order = body?.order
                     )
                 }
             } else {
-                // Non-200 responses (e.g. 401 Session Expired)
                 val errorBody = response.errorBody()?.string()
                 val parsedError = try { Gson().fromJson(errorBody, VerifyResponse::class.java) } catch (e: Exception) { null }
 
                 val message = when {
                     parsedError?.message != null -> parsedError.message
-                    response.code() == 401 -> context.getString(R.string.session_invalid)
                     else -> context.getString(R.string.ticket_error_default)
                 }
                 
@@ -243,7 +239,6 @@ object TicketManager {
             }
         } catch (e: Exception) {
             Log.e("TicketManager", "Verification request failed", e)
-            //   TicketResult.Error("Verification failed. Check network connection")
             
             val errorMessage = if (!isNetworkAvailable(context)) {
                 context.getString(R.string.login_failed_check_connection)

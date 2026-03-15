@@ -16,7 +16,7 @@
     <string name="label_buyer_phone">Número de Telefone</string>
     <string name="button_label_continue">CONTINUAR</string>
     <string name="session_cookie_not_found">Session cookie not found in response.</string>
-    <string name="invalid_pin_or_event_id">PIN ou ID do evento inválido.</string>
+    <string name="invalid_pin_or_event_id">PIN do evento inválido.</string>
     <string name="auth_manager_log_tag">AuthManager</string>
     <string name="login_request_failed">Login request failed</string>
     <string name="login_failed_check_connection">Não foi possível iniciar sessão. Verifica a tua ligação à internet.</string>
