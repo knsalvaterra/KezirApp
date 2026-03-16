@@ -193,16 +193,16 @@ object TicketManager {
         pin: String,
         code: String,
         eventId: String?
-    ): TicketResult {
+    ): TicketResult = withContext(Dispatchers.IO) {
         if (eventId == null) {
-            return TicketResult.Error(context.getString(R.string.ticket_error_no_id))
+            return@withContext TicketResult.Error(context.getString(R.string.ticket_error_no_id))
         }
 
         if (!isNetworkAvailable(context)) {
-            return TicketResult.Error(context.getString(R.string.login_failed_check_connection))
+            return@withContext TicketResult.Error(context.getString(R.string.login_failed_check_connection))
         }
 
-        return try {
+        return@withContext try {
             val response = ApiClient.api.verifyCode(
                 VerifyRequest(eventId, code, pin)
             )

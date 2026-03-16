@@ -19,6 +19,6 @@ data class StoredTicket(
 )
 
 enum class SyncStatus {
-    SYNCED,     // Matches the server
-    DIRTY       // Changed offline, needs uploading Uploading
+    SYNCED,     // matches the server
+    DIRTY       // changed offline, needs uploading Uploading
 }

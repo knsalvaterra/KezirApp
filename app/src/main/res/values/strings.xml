@@ -14,7 +14,7 @@
     <string name="scan_qr_code_label">Ler Código QR</string>
     <string name="label_buyer_name">Portador do Bilhete</string>
     <string name="label_buyer_phone">Número de Telefone</string>
-    <string name="button_label_continue">CONTINUAR</string>
+    <string name="button_label_continue">Continuar</string>
     <string name="session_cookie_not_found">Cookie de sessão não encontrado.</string>
     <string name="invalid_pin_or_event_id">PIN do evento inválido.</string>
     <string name="auth_manager_log_tag" translatable="false">AuthManager</string>
@@ -24,6 +24,7 @@
     <string name="qr_code_not_found">Código QR não encontrado.</string>
     <string name="label_button_scan">Ler</string>
     <string name="label_button_verify">Verificar</string>
+    <string name="label_button_verifying">A verificar…</string>
     <string name="label_button_scanning">A scanear…</string>
     <string name="insert_ticket_code">Introduzir código do bilhete</string>
     <string name="status_subtitle_success">Verificado com sucesso</string>

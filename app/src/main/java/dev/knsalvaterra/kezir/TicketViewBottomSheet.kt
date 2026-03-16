@@ -40,7 +40,8 @@ class TicketViewBottomSheet(
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.layout_ticket_sheet, container, true)
+
+        return inflater.inflate(R.layout.layout_ticket_sheet, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -223,7 +224,7 @@ class TicketViewBottomSheet(
             buyerPhone.text = censorPhoneNumber(order?.buyer_phone ?: "")
 
             ticketsLabel.visibility = View.VISIBLE
-            ticketDetailsContainer.visibility = View.GONE
+            ticketDetailsContainer.visibility = View.VISIBLE
             ticketDetailsContainer.removeAllViews()
             order?.tickets?.forEach { ticket ->
                 val inflater = LayoutInflater.from(requireContext())

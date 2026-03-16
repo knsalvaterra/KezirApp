@@ -21,10 +21,18 @@ class MainViewModel : ViewModel() {
     private val _shouldScan = MutableLiveData<Boolean>(false)
     val shouldScan: LiveData<Boolean> = _shouldScan
 
+    private val _isVerifying = MutableLiveData<Boolean>(false)
+
+
+    private val _verifying = MutableLiveData<Boolean>(false)
+    val isVerifying: LiveData<Boolean> = _verifying
+
     fun verifyCode(context: Context, pin: String, code: String, eventId: String?) {
         viewModelScope.launch {
+            _verifying.value = true
             val result = TicketManager.evaluateTicket(context, pin, code, eventId)
             _ticketResult.value = result
+            _verifying.value = false
         }
     }
 

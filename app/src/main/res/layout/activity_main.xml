@@ -26,8 +26,8 @@
         app:overlay_borderWidth="8dp"
         app:overlay_cornerLengthRatio="0.1"
         app:overlay_cornerRadius="16dp"
-        app:overlay_sizePercentage="0.70"
-        app:overlay_verticalBias="0.5" />
+        app:overlay_sizePercentage="0.7"
+        app:overlay_verticalBias="0.45" />
 
     <View
         android:layout_width="match_parent"
@@ -51,7 +51,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/scanner_overlay"
-        app:layout_constraintVertical_bias="0.25" />
+        app:layout_constraintVertical_bias="0.20" />
 
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/toolbar"

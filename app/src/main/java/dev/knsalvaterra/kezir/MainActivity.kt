@@ -74,6 +74,7 @@ class MainActivity : AppCompatActivity() {
     private var userPin: String? = null
 
     private val scanDuration = 850L
+    private var activeResultSheet: TicketViewBottomSheet? = null
 
     companion object {
         private val VIBRATION_SUCCESS_PATTERN = longArrayOf(0, 150)
@@ -183,6 +184,15 @@ class MainActivity : AppCompatActivity() {
         viewModel.isScanning.observe(this) { 
             updateButtonState()
         }
+
+        viewModel.isVerifying.observe(this) { isVerifying ->
+            binding.scanButton.isEnabled = !isVerifying
+            if (isVerifying) {
+                binding.scanButton.text = getString(R.string.label_button_verifying)
+            } else {
+                updateButtonState()
+            }
+        }
     }
 
     private fun updateScannerOverlay(sizePercentage: Float, verticalBias: Float = 0.5f) {
@@ -200,6 +210,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun updateButtonState() {
+        if (viewModel.isVerifying.value == true) return
+
         if (viewModel.isScanning.value == true) {
             binding.scanButton.text = getString(R.string.label_button_scanning)
             binding.scanButton.isEnabled = false
@@ -211,7 +223,6 @@ class MainActivity : AppCompatActivity() {
             binding.scanButton.text = getString(R.string.label_button_scan)
             binding.scanButton.isEnabled = true
         } else {
-
             binding.scanButton.text = getString(R.string.label_button_verify)
             binding.scanButton.isEnabled = validCodeFormat(code)
         }
@@ -379,8 +390,11 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun showTicketResult(result: TicketResult) {
+        if (activeResultSheet?.isAdded == true) return
+
         val onDismissed = {
             binding.manualInput.text?.clear()
+            activeResultSheet = null
             updateButtonState()
         }
 
@@ -390,7 +404,7 @@ class MainActivity : AppCompatActivity() {
             vibrate(VIBRATION_FAILURE_PATTERN)
         }
 
-        val sheet = when (result) {
+        activeResultSheet = when (result) {
             is TicketResult.Success -> TicketViewBottomSheet(
                 success = true,
                 message = result.message,
@@ -404,7 +418,7 @@ class MainActivity : AppCompatActivity() {
                 onDismissed = onDismissed,
             )
         }
-        sheet.show(supportFragmentManager, "result")
+        activeResultSheet?.show(supportFragmentManager, "result")
     }
 
     private fun isValidSession(): Boolean {
