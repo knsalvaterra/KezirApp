@@ -5,14 +5,20 @@ import androidx.room.PrimaryKey
 //todo
 @Entity(tableName = "offline_tickets")
 data class StoredTicket(
-    @PrimaryKey
-    val code: String,
+    @PrimaryKey val code: String,
+    val ticketType: String,
+    val holderName: String,
 
+    val eventId: String,
     val buyerName: String,
     val buyerPhone: String,
-    val ticketType: String,
-    val ticketName: String,
-    val tableCapacity: String?,
-    val quantity: String,
-    val eventId: String
+    val isUsed: Boolean = false,
+    val usedAt: Long? = null,
+    // track if this change has been sent to the server
+    val syncStatus: SyncStatus = SyncStatus.SYNCED
 )
+
+enum class SyncStatus {
+    SYNCED,     // Matches the server
+    DIRTY       // Changed offline, needs uploading Uploading
+}

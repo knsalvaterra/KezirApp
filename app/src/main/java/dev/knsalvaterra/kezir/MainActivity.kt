@@ -18,6 +18,7 @@ import android.util.Size
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.viewModels
 import androidx.annotation.OptIn
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -38,9 +39,9 @@ import com.google.mlkit.vision.barcode.BarcodeScannerOptions
 import com.google.mlkit.vision.barcode.BarcodeScanning
 import com.google.mlkit.vision.barcode.common.Barcode
 import com.google.mlkit.vision.common.InputImage
-import dev.knsalvaterra.kezir.api.TicketManager
 import dev.knsalvaterra.kezir.api.TicketResult
 import dev.knsalvaterra.kezir.databinding.ActivityMainBinding
+import dev.knsalvaterra.kezir.viewmodel.MainViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.util.concurrent.ExecutorService
@@ -51,6 +52,7 @@ import kotlin.math.min
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
+    private val viewModel: MainViewModel by viewModels()
     private val cameraExecutor: ExecutorService by lazy { Executors.newSingleThreadExecutor() }
     private val barcodeScanner: BarcodeScanner by lazy {
         BarcodeScanning.getClient(
@@ -70,8 +72,6 @@ class MainActivity : AppCompatActivity() {
 
     private var eventId: String? = null
     private var userPin: String? = null
-    private var shouldScan: Boolean = false
-    private var isScanning: Boolean = false
 
     private val scanDuration = 850L
 
@@ -129,6 +129,11 @@ class MainActivity : AppCompatActivity() {
             return
         }
 
+        initializeUI()
+        observeViewModel()
+    }
+
+    private fun initializeUI() {
         binding.manualInput.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
@@ -140,17 +145,8 @@ class MainActivity : AppCompatActivity() {
         binding.scanButton.setOnClickListener {
             val code = binding.manualInput.text.toString().trim()
             if (code.isEmpty()) {
-                if (!isScanning) {
-                    lifecycleScope.launch {
-                        isScanning = true
-                        updateButtonState()
-                        delay(scanDuration)
-                        shouldScan = true
-                        isScanning = false
-                        if (binding.manualInput.text.toString().trim().isEmpty()) {
-                            updateButtonState()
-                        }
-                    }
+                if (viewModel.isScanning.value != true) {
+                    viewModel.triggerScan(scanDuration)
                 }
             } else if (validCodeFormat(code)) {
                 verifyCode(code)
@@ -179,6 +175,16 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private fun observeViewModel() {
+        viewModel.ticketResult.observe(this) { result ->
+            showTicketResult(result)
+        }
+        
+        viewModel.isScanning.observe(this) { 
+            updateButtonState()
+        }
+    }
+
     private fun updateScannerOverlay(sizePercentage: Float, verticalBias: Float = 0.5f) {
         val width = binding.viewFinder.width.toFloat()
         val height = binding.viewFinder.height.toFloat()
@@ -194,7 +200,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun updateButtonState() {
-        if (isScanning) {
+        if (viewModel.isScanning.value == true) {
             binding.scanButton.text = getString(R.string.label_button_scanning)
             binding.scanButton.isEnabled = false
             return
@@ -248,12 +254,12 @@ class MainActivity : AppCompatActivity() {
 
     @OptIn(ExperimentalGetImage::class)
     private fun processImageProxy(imageProxy: ImageProxy) {
-        if (!shouldScan || !::scanArea.isInitialized || imageProxy.image == null) {
+        if (viewModel.shouldScan.value != true || !::scanArea.isInitialized || imageProxy.image == null) {
             imageProxy.close()
             return
         }
 
-        shouldScan = false
+        viewModel.setShouldScan(false)
 
         val imageScanArea = getTransformedScanArea(imageProxy)
         if (imageScanArea.isEmpty) {
@@ -369,10 +375,7 @@ class MainActivity : AppCompatActivity() {
             return
         }
 
-        lifecycleScope.launch {
-            val result = TicketManager.evaluateTicket(this@MainActivity, pin, code, eventId)
-            showTicketResult(result)
-        }
+        viewModel.verifyCode(this, pin, code, eventId)
     }
 
     private fun showTicketResult(result: TicketResult) {

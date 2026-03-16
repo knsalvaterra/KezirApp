@@ -159,33 +159,33 @@ object TicketManager {
         }
     }
 
-    private suspend fun verifyTicketOffline(context: Context, code: String): TicketResult {
-        val ticketDao = AppDatabase.getDatabase(context).ticketDao()
-        val tkt = withContext(Dispatchers.IO) {
-            ticketDao.getTicketByCode(code)
-        }
-
-        return if (tkt != null) {
-            val mockOrder = Order(
-                buyer_name = tkt.buyerName,
-                buyer_phone = tkt.buyerPhone,
-                tickets = listOf(
-                    Ticket(
-                        ticket_type = tkt.ticketType,
-                        ticket_name = tkt.ticketName,
-                        table_capacity = tkt.tableCapacity,
-                        quantity = tkt.quantity
-                    )
-                )
-            )
-            TicketResult.Success(
-                context.getString(R.string.ticket_verified_offline),
-                mockOrder
-            )
-        } else {
-            TicketResult.Error(context.getString(R.string.ticket_error_offline_invalid))
-        }
-    }
+  //  private suspend fun verifyTicketOffline(context: Context, code: String): TicketResult {
+  //      val ticketDao = AppDatabase.getDatabase(context).ticketDao()
+  //      val tkt = withContext(Dispatchers.IO) {
+  //          ticketDao.getTicketByCode(code)
+  //      }
+//
+  //      return if (tkt != null) {
+  //          val mockOrder = Order(
+  //              buyer_name = tkt.buyerName,
+  //              buyer_phone = tkt.buyerPhone,
+  //              tickets = listOf(
+  //                  Ticket(
+  //                      ticket_type = tkt.ticketType,
+  //                      ticket_name = tkt.ticketName,
+  //                      table_capacity = tkt.tableCapacity,
+  //                      quantity = tkt.quantity
+  //                  )
+  //              )
+  //          )
+  //          TicketResult.Success(
+  //              context.getString(R.string.ticket_verified_offline),
+  //              mockOrder
+  //          )
+  //      } else {
+  //          TicketResult.Error(context.getString(R.string.ticket_error_offline_invalid))
+  //      }
+  //  }
 
     @SuppressLint("SuspiciousIndentation")
     suspend fun evaluateTicket(
@@ -249,19 +249,19 @@ object TicketManager {
         }
     }
 
-    private suspend fun cacheTicketLocally(context: Context, code: String, eventId: String, order: Order) {
-        val ticketDao = AppDatabase.getDatabase(context).ticketDao()
-        val stored = StoredTicket(
-            code = code,
-            eventId = eventId,
-            buyerName = order.buyer_name,
-            buyerPhone = order.buyer_phone,
-            ticketType = order.tickets.firstOrNull()?.ticket_type ?: "",
-            ticketName = order.tickets.firstOrNull()?.ticket_name ?: "",
-            quantity = order.tickets.firstOrNull()?.quantity ?: "1"
-            ,
-            tableCapacity = null
-        )
-        withContext(Dispatchers.IO) { ticketDao.insertTicket(stored) }
-    }
+  //  private suspend fun cacheTicketLocally(context: Context, code: String, eventId: String, order: Order) {
+  //      val ticketDao = AppDatabase.getDatabase(context).ticketDao()
+  //      val stored = StoredTicket(
+  //          code = code,
+  //          eventId = eventId,
+  //          buyerName = order.buyer_name,
+  //          buyerPhone = order.buyer_phone,
+  //          ticketType = order.tickets.firstOrNull()?.ticket_type ?: "",
+  //          ticketName = order.tickets.firstOrNull()?.ticket_name ?: "",
+  //          quantity = order.tickets.firstOrNull()?.quantity ?: "1"
+  //          ,
+  //          tableCapacity = null
+  //      )
+  //      withContext(Dispatchers.IO) { ticketDao.insertTicket(stored) }
+  //  }
 }

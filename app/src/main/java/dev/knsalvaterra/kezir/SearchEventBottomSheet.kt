@@ -10,19 +10,18 @@ import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.lifecycle.lifecycleScope
+import androidx.fragment.app.viewModels
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import dev.knsalvaterra.kezir.api.ApiClient
 import dev.knsalvaterra.kezir.api.Event
 import dev.knsalvaterra.kezir.databinding.LayoutSearchEventBinding
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import dev.knsalvaterra.kezir.viewmodel.SearchViewModel
 
 class SearchEventBottomSheet(private val onEventSelected: (Event) -> Unit) : BottomSheetDialogFragment() {
 
     private var _binding: LayoutSearchEventBinding? = null
     private val binding get() = _binding!!
     private lateinit var eventAdapter: EventAdapter
+    private val viewModel: SearchViewModel by viewModels()
 
     override fun getTheme(): Int = R.style.CustomBottomSheetDialogTheme
 
@@ -40,13 +39,9 @@ class SearchEventBottomSheet(private val onEventSelected: (Event) -> Unit) : Bot
 
         setupRecyclerView()
         setupSearchLogic()
+        observeViewModel()
         
-        // Use pre-loaded data or fetch if not available
-        if (preloadedEvents.isNotEmpty()) {
-            displayEvents(preloadedEvents)
-        } else {//prolly not necessary unless by some unknown rrwson fetching from login didnt work
-            fetchAllEvents()
-        }
+        viewModel.loadEvents()
     }
 
     private fun setupRecyclerView() {
@@ -60,6 +55,19 @@ class SearchEventBottomSheet(private val onEventSelected: (Event) -> Unit) : Bot
             itemAnimator = null
         }
     }
+
+    private fun observeViewModel() {
+        viewModel.events.observe(viewLifecycleOwner) { events ->
+            displayEvents(events)
+        }
+        viewModel.isLoading.observe(viewLifecycleOwner) { isLoading ->
+            if (isLoading) showLoading() else hideLoading()
+        }
+        viewModel.error.observe(viewLifecycleOwner) { error ->
+            error?.let { showError(it) }
+        }
+    }
+
 //mayube make a util cuz i already havbe this in main
     private fun vibrate() {
         val vibrator = requireContext().getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
@@ -76,43 +84,9 @@ class SearchEventBottomSheet(private val onEventSelected: (Event) -> Unit) : Bot
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
             override fun afterTextChanged(s: Editable?) {
-                applyLocalFilter(s.toString().trim())
+                viewModel.filterEvents(s.toString().trim())
             }
         })
-    }
-
-    private fun fetchAllEvents() {
-        showLoading()
-        lifecycleScope.launch {
-            try {
-                val response = ApiClient.api.searchEvents("")
-                hideLoading()
-
-                if (response.isSuccessful) {
-                    preloadedEvents = response.body()?.events ?: emptyList()
-                    displayEvents(preloadedEvents)
-                } else {
-                    showError(getString(R.string.search_error))
-                }
-            } catch (e: Exception) {
-                hideLoading()
-                showError(getString(R.string.search_no_internet))
-            }
-        }
-    }
-
-    private fun applyLocalFilter(query: String) {
-        if (query.isEmpty()) {
-            displayEvents(preloadedEvents) //show all availabnle events
-            return
-        }
-
-        val filteredResults = preloadedEvents.filter { 
-            it.title.contains(query, ignoreCase = true) ||  //search by name or loc name
-            it.location.contains(query, ignoreCase = true) 
-        }
-        
-        displayEvents(filteredResults)
     }
 
     private fun displayEvents(events: List<Event>) {
@@ -148,23 +122,11 @@ class SearchEventBottomSheet(private val onEventSelected: (Event) -> Unit) : Bot
     }
 
     companion object {
-        private var preloadedEvents: List<Event> = emptyList()
-
         /**
          * pre-fetches all events from the API.
          */
         fun preloadEvents() {
-            @Suppress("OPT_IN_USAGE")
-            kotlinx.coroutines.GlobalScope.launch(Dispatchers.IO) {
-                try {
-                    val response = ApiClient.api.searchEvents("")
-                    if (response.isSuccessful) {
-                        preloadedEvents = response.body()?.events ?: emptyList()
-                    }
-                } catch (e: Exception) {
-                    // Fail silently
-                }
-            }
+            SearchViewModel.preloadEvents()
         }
     }
 }

@@ -6,29 +6,29 @@ import android.net.ConnectivityManager
 import android.net.Uri
 import android.os.Bundle
 import android.widget.Toast
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.lifecycleScope
-import dev.knsalvaterra.kezir.api.AuthManager
 import dev.knsalvaterra.kezir.api.LoginResult
 import dev.knsalvaterra.kezir.databinding.ActivityLoginBinding
-import kotlinx.coroutines.launch
+import dev.knsalvaterra.kezir.viewmodel.LoginViewModel
 
 class LoginActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityLoginBinding
-    
+    private val viewModel: LoginViewModel by viewModels()
 
     private val allowManualEventIdInput = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         
-        AuthManager.getInMemorySession()?.let { (id, pin) ->
+        viewModel.getInMemorySession()?.let { (id, pin) ->
             openMainScreen(id, pin)
             return
         }
 
         initializeUI()
+        observeViewModel()
         
         //  pre-loading events as soon as the app opens to make searching fast
         SearchEventBottomSheet.preloadEvents()
@@ -45,21 +45,21 @@ class LoginActivity : AppCompatActivity() {
         }
     }
 
+    private fun observeViewModel() {
+        viewModel.loginResult.observe(this) { result ->
+            handleLoginResult(result)
+        }
+    }
+
     private fun validLink(uri: Uri?): Boolean {
         return uri != null &&
                 uri.path?.contains("auth") == true &&
                 (uri.scheme == "kezir" || uri.host == "kezir.app")
     }
 
-    private fun performLogin(pin: String, eventId: String) {
-        lifecycleScope.launch {
-            val result = AuthManager.login(pin, eventId)
-            handleLoginResult(result)
-        }
-    }
-
     private fun initializeUI() {
         if (::binding.isInitialized) return
+
         binding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
@@ -86,7 +86,7 @@ class LoginActivity : AppCompatActivity() {
 
             if (eventId.isNotBlank() && pin.isNotBlank()) {
                 if (isNetworkAvailable()) {
-                    performLogin(pin, eventId)
+                    viewModel.performLogin(pin, eventId)
                 } //else {
                   //  lifecycleScope.launch {
                   //      val result = AuthManager.login("m836v1d0grchu3mgu5v2e3ne91")
@@ -131,7 +131,7 @@ class LoginActivity : AppCompatActivity() {
     private fun handleLoginResult(result: LoginResult) {
         when (result) {
             is LoginResult.Success -> {
-                AuthManager.saveSessionInMemory(result.eventId, result.pin)
+                viewModel.saveSessionInMemory(result.eventId, result.pin)
                 openMainScreen(result.eventId, result.pin)
             }
             is LoginResult.Error -> {
