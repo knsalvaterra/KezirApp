@@ -37,7 +37,7 @@ class MainViewModel : ViewModel() {
     }
 
     /**
-     * Triggers the scanning process with the specified delay.
+     * triggers the scanning process with the specified delay
      */
     fun triggerScan(duration: Long) {
         viewModelScope.launch {

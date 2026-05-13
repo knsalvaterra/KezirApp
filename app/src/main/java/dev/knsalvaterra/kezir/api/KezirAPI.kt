@@ -135,7 +135,7 @@ object ApiClient {
 
     val api: ApiService by lazy {
         Retrofit.Builder()
-            .baseUrl("https://stage.kezir.st/")
+            .baseUrl("https://kezir.st/")
             .addConverterFactory(GsonConverterFactory.create())
             .build()
             .create(ApiService::class.java)
